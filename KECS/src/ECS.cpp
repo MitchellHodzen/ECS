@@ -27,17 +27,19 @@ ECS::ECS()
 
 	ComponentManager cm(&em);
 	cm.PrintEntityKey(ent1);
-	cm.PrintEntityKey(ent2);
+	cm.PrintEntityKey(ent2); 
 	cm.PrintEntityKey(ent3);
 	cm.AddComponent<Position>(ent1);
-	cm.AddComponent<Position>(ent2);
-	cm.AddComponent<Velocity>(ent2);
+	cm.AddComponent<Position, Velocity>(ent2);
+	cm.AddComponent<Velocity, Position>(ent3);
 	cm.AddComponent<Velocity>(10);
 	cm.PrintEntityKey(ent1);
 	cm.PrintEntityKey(ent2);
 	cm.PrintEntityKey(ent3);
 	cm.RemoveComponent<Position>(ent2);
 	cm.RemoveComponent<Position>(10);
+	cm.RemoveComponent<Position, Velocity>(ent3);
+	cm.RemoveComponent<Position, Velocity>(ent1);
 	cm.PrintEntityKey(ent1);
 	cm.PrintEntityKey(ent2);
 	cm.PrintEntityKey(ent3);
