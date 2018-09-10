@@ -4,6 +4,7 @@
 #include "Components/c_position.h"
 #include"ComponentManager.h"
 
+#define MAX_ENTITIES 10
 
 ECS::ECS()
 {
@@ -43,6 +44,27 @@ ECS::ECS()
 	cm.PrintEntityKey(ent1);
 	cm.PrintEntityKey(ent2);
 	cm.PrintEntityKey(ent3);
+
+	Position* p = ComponentManager::GetArray<Position>();
+
+	for (int i = 0; i < MAX_ENTITIES; ++i)
+	{
+		std::cout << p[i].x << ", " << p[i].y << std::endl;
+	}
+
+	Velocity* v = ComponentManager::GetArray<Velocity>();
+
+	for (int i = 0; i < MAX_ENTITIES; ++i)
+	{
+		std::cout << v[i].dx << ", " << v[i].dy << std::endl;
+	}
+
+	Position* e = ComponentManager::GetArray<Position>();
+
+	for (int i = 0; i < MAX_ENTITIES; ++i)
+	{
+		std::cout << e[i].x << ", " << e[i].y << std::endl;
+	}
 }
 
 

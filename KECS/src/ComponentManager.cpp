@@ -18,3 +18,6 @@ ComponentManager::~ComponentManager()
 	delete[] positionComponentArray;
 	delete[] velocityComponentArray;
 }
+
+
+int ComponentManager::componentIndexCounter = 0;

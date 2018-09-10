@@ -1,4 +1,6 @@
 #pragma once
+#define MAX_ENTITIES 10
+
 
 #include <bitset>
 #include <type_traits>
@@ -82,6 +84,22 @@ public:
 	{
 		std::cout << entityIndex << ": " << entityKeyArray[entityIndex] << std::endl;
 	}
+
+
+	template <typename T> static T* GetArray() {
+		std::cout << "Component index: "<< ComponentArrayMap<T>::componentIndex << std::endl;
+		return ComponentArrayMap<T>::componentArray;
+	}
+
+	//Maps a given component struct to the various component variables
+	static int componentIndexCounter;
+	template <typename T>
+	struct ComponentArrayMap { 
+		static T* componentArray; 
+		static int componentIndex;
+	};
+
+
 private:
 	int maxEntities;
 	std::bitset<Components::COMPONENT_COUNT>* entityKeyArray;
@@ -90,3 +108,10 @@ private:
 	EntityManager* em;
 };
 
+//int ComponentManager::componentIndexCounter = 0;
+
+template <typename T>
+T* ComponentManager::ComponentArrayMap<T>::componentArray = new T[MAX_ENTITIES];
+
+template <typename T>
+int ComponentManager::ComponentArrayMap<T>::componentIndex = ComponentManager::componentIndexCounter++;
