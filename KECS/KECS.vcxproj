@@ -133,17 +133,20 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\ComponentManager.cpp" />
     <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\ECS.cpp" />
     <ClCompile Include="src\Entry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\ComponentManager.h" />
     <ClInclude Include="include\Components\c_position.h" />
     <ClInclude Include="include\Components\c_velocity.h" />
     <ClInclude Include="include\EntityManager.h" />
     <ClInclude Include="include\ECS.h" />
+    <ClInclude Include="include\Stack.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

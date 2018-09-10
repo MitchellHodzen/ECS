@@ -3,35 +3,40 @@
 #include <bitset>
 #include <type_traits>
 #include <iostream>
-
+#include "EntityManager.h"
 //Forward declarations
 struct Position;
 struct Velocity;
 
+
 class ComponentManager
 {
 public:
-	ComponentManager(int maxEntities);
+	ComponentManager(EntityManager* em);
 	~ComponentManager();
 	enum Components {position, velocity, COMPONENT_COUNT};
 
 	//Template function to add a component 
-	template<typename T> void AddComponent(int entityID)
+	template<typename T> void AddComponent(int entityIndex)
 	{
 		if constexpr (std::is_same<T, Position>::value)
 		{
-			if (!entityKeyArray[entityID][Components::position])
+			if (em->IsValidEntityIndex(entityIndex) && !entityKeyArray[entityIndex][Components::position])
 			{
-				std::cout << "Adding entity " << entityID << "'s Position component" << std::endl;
-				entityKeyArray[entityID][Components::position] = true;
+				std::cout << "Adding entity " << entityIndex << "'s Position component" << std::endl;
+				entityKeyArray[entityIndex][Components::position] = true;
+				positionComponentArray[entityIndex].x = 0;
+				positionComponentArray[entityIndex].y = 0;
 			}
 		}
 		else if constexpr (std::is_same<T, Velocity>::value)
 		{
-			if (!entityKeyArray[entityID][Components::velocity])
+			if (em->IsValidEntityIndex(entityIndex) && !entityKeyArray[entityIndex][Components::velocity])
 			{
-				std::cout << "Adding entity " << entityID << "'s Velocity component" << std::endl;
-				entityKeyArray[entityID][Components::velocity] = true;
+				std::cout << "Adding entity " << entityIndex << "'s Velocity component" << std::endl;
+				entityKeyArray[entityIndex][Components::velocity] = true;
+				velocityComponentArray[entityIndex].dx = 0;
+				velocityComponentArray[entityIndex].dy = 0;
 			}
 		}
 		else {
@@ -39,22 +44,22 @@ public:
 		}
 	}
 
-	template<typename T> void RemoveComponent(int entityID)
+	template<typename T> void RemoveComponent(int entityIndex)
 	{
 		if constexpr (std::is_same<T, Position>::value)
 		{
-			if (entityKeyArray[entityID][Components::position])
+			if (em->IsValidEntityIndex(entityIndex) && entityKeyArray[entityIndex][Components::position])
 			{
-				std::cout << "Removing entity " << entityID << "'s Position component" << std::endl;
-				entityKeyArray[entityID][Components::position] = false;
+				std::cout << "Removing entity " << entityIndex << "'s Position component" << std::endl;
+				entityKeyArray[entityIndex][Components::position] = false;
 			}
 		}
 		else if constexpr (std::is_same<T, Velocity>::value)
 		{
-			if (entityKeyArray[entityID][Components::velocity])
+			if (em->IsValidEntityIndex(entityIndex) && entityKeyArray[entityIndex][Components::velocity])
 			{
-				std::cout << "Removing entity " << entityID << "'s Velocity component" << std::endl;
-				entityKeyArray[entityID][Components::velocity] = false;
+				std::cout << "Removing entity " << entityIndex << "'s Velocity component" << std::endl;
+				entityKeyArray[entityIndex][Components::velocity] = false;
 			}
 		}
 		else {
@@ -62,14 +67,15 @@ public:
 		}
 	}
 
-	void PrintEntityKey(int entityID)
+	void PrintEntityKey(int entityIndex)
 	{
-		std::cout << entityID << ": " << entityKeyArray[entityID] << std::endl;
+		std::cout << entityIndex << ": " << entityKeyArray[entityIndex] << std::endl;
 	}
 private:
 	int maxEntities;
 	std::bitset<Components::COMPONENT_COUNT>* entityKeyArray;
 	Position* positionComponentArray;
 	Velocity* velocityComponentArray;
+	EntityManager* em;
 };
 

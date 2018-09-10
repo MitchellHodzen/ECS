@@ -1,10 +1,12 @@
 #include "ComponentManager.h"
 #include "Components/c_position.h"
 #include "Components/c_velocity.h"
+#include <iostream>
 
-ComponentManager::ComponentManager(int maxEntities)
+ComponentManager::ComponentManager(EntityManager* em)
 {
-	this->maxEntities = maxEntities;
+	this->em = em;
+	this->maxEntities = em->GetMaxEntities();
 	entityKeyArray = new std::bitset<Components::COMPONENT_COUNT>[maxEntities];
 	positionComponentArray = new Position[maxEntities];
 	velocityComponentArray = new Velocity[maxEntities];

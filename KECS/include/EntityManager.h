@@ -1,13 +1,22 @@
 #pragma once
+#include "Stack.h"
+class Entity;
 
 class EntityManager
 {
 public:
 	EntityManager(int maxEntities);
 	~EntityManager();
-	int GetEntity();
-	void DestroyEntity(int entityID);
+	int CreateEntity();
+	void DestroyEntity(int entityIndex);
+	void PrintValidEntities();
+	bool IsValidEntityIndex(int entityIndex);
+	int GetMaxEntities();
 private:
-	int maxEntities;
+	int maxEntities = 0;
+	Stack<int>* availableEntityIndicies;
+	bool* validEntityIndicies;
+	int entityCount = 0;
+	void SetValidEntityIndex(int entityIndex, bool value);
 };
 
