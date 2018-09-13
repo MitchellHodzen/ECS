@@ -1,5 +1,4 @@
 #pragma once
-#define MAX_ENTITIES 10
 //#define COMPONENT_COUNT 3
 //try to implement bitset?
 
@@ -13,27 +12,10 @@
 class ComponentManager
 {
 public:
-	ComponentManager(EntityManager* em);
-	~ComponentManager();
-	enum Components {position, velocity, COMPONENT_COUNT2};
+	ComponentManager() {};
+	~ComponentManager() {};
 
-//	static const int COMPONENT_COUNT;
-
-	//static inline int COMPONENT_COUNT;
-
-
-	template<typename T> static inline T* componentArray = nullptr;
-	template<typename T> static inline int componentIndex = 0;
-	template<typename T> static inline bool* entityComponentFlags = nullptr;
-	/*
-	static inline int COMPONENT_COUNT;
-
-
-	static inline constexpr int GetComponentCount()
-	{
-		return COMPONENT_COUNT;
-	};
-	*/
+	static inline EntityManager* em;
 
 	template<typename T, typename... Args> static void SetUpComponents()
 	{
@@ -50,13 +32,12 @@ public:
 	}
 	template<typename T> static void AddComponent(int entityIndex)
 	{
-		if (em->IsValidEntityIndex(entityIndex) && !HasComponent<T>(entityIndex))//!entityKeyArray[entityIndex][componentIndex<T>])
+		if (em->IsValidEntityIndex(entityIndex) && !HasComponent<T>(entityIndex))
 		{
 			std::cout << "Adding entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
-			//entityKeyArray[entityIndex][componentIndex<T>] = true;
 			UpdateEntityComponent<T>(entityIndex, true);
-			//positionComponentArray[entityIndex].x = 0;
-			//positionComponentArray[entityIndex].y = 0;
+			//Reset the component to default values
+			componentArray<T>[entityIndex] = T();
 		}
 	}
 
@@ -66,13 +47,11 @@ public:
 		RemoveComponent<T>(entityIndex);
 		RemoveComponent<S, Args...>(entityIndex);
 	}
-
 	template<typename T> static void RemoveComponent(int entityIndex)
 	{
-		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))//entityKeyArray[entityIndex][componentIndex<T>])
+		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
 		{
 			std::cout << "Removing entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
-			//entityKeyArray[entityIndex][componentIndex<T>] = false;
 			UpdateEntityComponent<T>(entityIndex, false);
 		}
 	}
@@ -82,12 +61,6 @@ public:
 	{
 		return (HasComponent<T>(entityIndex) && HasComponent<S, Args...>(entityIndex));
 	}
-
-	template<typename T> static void UpdateEntityComponent(int entityIndex, bool value)
-	{
-		entityComponentFlags<T>[entityIndex] = value;
-	}
-
 	template<typename T> static bool HasComponent(int entityIndex)
 	{
 		if (em->IsValidEntityIndex(entityIndex))
@@ -98,22 +71,14 @@ public:
 	}
 
 
-	/*
-	void PrintEntityKey(int entityIndex)
-	{
-		std::cout << entityIndex << ": " << entityKeyArray[entityIndex] << std::endl;
-	}
-	*/
-	static inline EntityManager* em;
-
 private:
 	//std::bitset<std::as_const<const int>(COMPONENT_COUNT)>* entityKeyArray = new std::bitset<const_cast<COMPONENT_COUNT>>[MAX_ENTITIES];
-	//static inline void* entityKeyArray;
-
-
-	//template<int SIZE> static inline std::bitset<SIZE>* entityKeyArray; 
-	//template<int T> static inline const int COMPONENT_COUNT = T;
 	
+	template<typename T> static inline T* componentArray = nullptr;
+	template<typename T> static inline int componentIndex = 0;
+	template<typename T> static inline bool* entityComponentFlags = nullptr;
+
+	//Template function for setting up components
 	template<typename T, typename S, typename... Args> static void SetComponentValues(int index)
 	{
 		SetComponentValues<T>(index);
@@ -128,5 +93,11 @@ private:
 		{
 			entityComponentFlags<T>[i] = false;
 		}
+	}
+
+	//Set the flag for whether an entity has or doesn't have a component
+	template<typename T> static void UpdateEntityComponent(int entityIndex, bool value)
+	{
+		entityComponentFlags<T>[entityIndex] = value;
 	}
 };
