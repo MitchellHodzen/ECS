@@ -5,19 +5,13 @@
 
 ComponentManager::ComponentManager(EntityManager* em)
 {
-	this->em = em;
-	this->maxEntities = em->GetMaxEntities();
-	entityKeyArray = new std::bitset<Components::COMPONENT_COUNT>[maxEntities];
-	positionComponentArray = new Position[maxEntities];
-	velocityComponentArray = new Velocity[maxEntities];
+	//this->em = em;
+	//this->maxEntities = em->GetMaxEntities();
 }
 
 
 ComponentManager::~ComponentManager()
 {
-	delete[] positionComponentArray;
-	delete[] velocityComponentArray;
+	//delete[] positionComponentArray;
+	//delete[] velocityComponentArray;
 }
-
-
-int ComponentManager::componentIndexCounter = 0;

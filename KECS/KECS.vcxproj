@@ -140,6 +140,7 @@
     <ClCompile Include="src\Entry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Components\c_test.h" />
     <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\ComponentManager.h" />
     <ClInclude Include="include\Components\c_position.h" />
