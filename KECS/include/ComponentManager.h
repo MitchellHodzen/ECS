@@ -12,8 +12,6 @@
 class ComponentManager
 {
 public:
-	ComponentManager() {};
-	~ComponentManager() {};
 
 	static inline EntityManager* em;
 
@@ -90,6 +88,8 @@ public:
 	template<typename T> static inline T* componentArray = nullptr;
 
 private:
+	ComponentManager() {};
+	~ComponentManager() {};
 	//std::bitset<std::as_const<const int>(COMPONENT_COUNT)>* entityKeyArray = new std::bitset<const_cast<COMPONENT_COUNT>>[MAX_ENTITIES];
 	
 	template<typename T> static inline int componentIndex = 0;

@@ -147,6 +147,7 @@
     <ClInclude Include="include\EntityManager.h" />
     <ClInclude Include="include\ECS.h" />
     <ClInclude Include="include\Stack.h" />
+    <ClInclude Include="include\System.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

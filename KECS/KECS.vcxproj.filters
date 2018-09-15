@@ -53,5 +53,8 @@
     <ClInclude Include="include\Components\c_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
