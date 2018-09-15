@@ -70,11 +70,28 @@ public:
 		return false;
 	}
 
+	//Template function to get an entities component 
+	template<typename T> static T GetComponent(int entityIndex)
+	{
+		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+		{
+			return componentArray<T>[entityIndex];
+		}
+	}
+
+	//Template function to set an entities component
+	template<typename T> static void SetComponent(int entityIndex, T value)
+	{
+		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+		{
+			componentArray<T>[entityIndex] = value;
+		}
+	}
+	template<typename T> static inline T* componentArray = nullptr;
 
 private:
 	//std::bitset<std::as_const<const int>(COMPONENT_COUNT)>* entityKeyArray = new std::bitset<const_cast<COMPONENT_COUNT>>[MAX_ENTITIES];
 	
-	template<typename T> static inline T* componentArray = nullptr;
 	template<typename T> static inline int componentIndex = 0;
 	template<typename T> static inline bool* entityComponentFlags = nullptr;
 
