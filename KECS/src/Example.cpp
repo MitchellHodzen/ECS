@@ -10,9 +10,19 @@ void Example::Draw(int entityIndex)
 {
 	//Render red filled quad 
 	Rect rect = ComponentManager::GetComponent<Rect>(entityIndex);
-	SDL_Rect fillRect = { rect.posX, rect.posY, rect.width, rect.height }; 
+	Position pos = ComponentManager::GetComponent<Position>(entityIndex);
+	SDL_Rect fillRect = { pos.x, pos.y, rect.width, rect.height }; 
 	SDL_SetRenderDrawColor( renderer, 0xFF, 0x00, 0x00, 0xFF ); 
 	SDL_RenderFillRect( renderer, &fillRect );
+}
+
+void Example::Physics(int entityIndex)
+{
+	Position pos = ComponentManager::GetComponent<Position>(entityIndex);
+	Velocity vel = ComponentManager::GetComponent<Velocity>(entityIndex);
+	pos.x += vel.dx;
+	pos.y += vel.dy;
+	ComponentManager::SetComponent<Position>(entityIndex, pos);
 }
 
 Example::Example(int screenWidth, int screenHeight)
@@ -39,6 +49,7 @@ void Example::Run()
 		int ent0 = em.CreateEntity();
 		ComponentManager::AddComponent<Position>(ent0);
 		ComponentManager::AddComponent<Rect>(ent0);
+		ComponentManager::AddComponent<Velocity>(ent0);
 		Rect rect;
 		rect.posX = 200;
 		rect.posY = 200;
@@ -48,20 +59,44 @@ void Example::Run()
 
 		while (!quit)
 		{
+			int dx = 0;
+			int dy = 0;
 			while (SDL_PollEvent(&e) != 0)
 			{
 				if( e.type == SDL_QUIT )
 				{ 
 					quit = true; 
 				}
+				else if( e.type == SDL_KEYDOWN ) 
+				{ 
+					//Select surfaces based on key press 
+					switch( e.key.keysym.sym ) 
+					{ 
+						case SDLK_UP: 
+							dy -= 5;
+							break; 
+						case SDLK_DOWN: 
+							dy += 5;
+							break; 
+						case SDLK_LEFT: 
+							dx -= 5;
+							break; 
+						case SDLK_RIGHT: 
+							dx += 5;
+							break; 
+						default: 
+							break; 
+					}
+				}
 			}
 			//Clear screen 
 			SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear( renderer ); 
-			//Render texture to screen 
-			//SDL_RenderCopy( gRenderer, gTexture, NULL, NULL );
-			//Update screen
-			//System::Run<Position, Rect>(std::bind(&Example::Draw, this));
+			Velocity newVelocity;
+			newVelocity.dx = dx;
+			newVelocity.dy = dy;
+			ComponentManager::SetComponent<Velocity>(ent0, newVelocity);
+			System::Run<Position, Velocity>([this](int x) {Physics(x); });
 			System::Run<Position, Rect>([this](int x){Draw(x); });
 			SDL_RenderPresent( renderer );
 		}

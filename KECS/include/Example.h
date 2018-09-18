@@ -16,6 +16,7 @@ private:
 	SDL_Renderer* renderer = nullptr; 
 	SDL_Texture* texture = nullptr;
 	void Draw(int entityIndex);
+	void Physics(int entityIndex);
 
 };
 
