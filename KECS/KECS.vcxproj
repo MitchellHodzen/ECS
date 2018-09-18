@@ -133,12 +133,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Example.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\ECS.cpp" />
     <ClCompile Include="src\Entry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Components\c_rect.h" />
+    <ClInclude Include="include\Example.h" />
     <ClInclude Include="include\Components\c_test.h" />
     <ClInclude Include="include\Entity.h" />
     <ClInclude Include="include\ComponentManager.h" />

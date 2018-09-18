@@ -1,10 +1,8 @@
 #include "ECS.h"
-#include "EntityManager.h"
 #include <iostream>
 #include "Components/c_position.h"
-#include"ComponentManager.h"
 #include "Components\c_test.h"
-#include "System.h"
+
 
 void PrintEntitiesPosition(int entityIndex) {
 	Position pos = ComponentManager::GetComponent<Position>(entityIndex);
@@ -24,6 +22,7 @@ void PrintEntitiesPositionAndVelocity(int entityIndex) {
 }
 ECS::ECS()
 {
+	/*
 	EntityManager em(5);
 	ComponentManager::SetUpComponents<Position, Velocity, Test>();
 	ComponentManager::em = &em;
@@ -48,6 +47,7 @@ ECS::ECS()
 	System::Run<Position>(PrintEntitiesPosition);
 	System::Run<Velocity>(PrintEntitiesVelocity);
 	System::Run<Position, Velocity>(PrintEntitiesPositionAndVelocity);
+	*/
 }
 
 
