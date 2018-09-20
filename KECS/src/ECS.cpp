@@ -3,6 +3,7 @@
 #include "Components/c_position.h"
 #include "Components\c_test.h"
 
+/*
 
 void PrintEntitiesPosition(int entityIndex) {
 	Position pos = ComponentManager::GetComponent<Position>(entityIndex);
@@ -20,6 +21,7 @@ void PrintEntitiesPositionAndVelocity(int entityIndex) {
 	std::cout << "Entity " << entityIndex << "'s Position and Velocity is: (" << pos.x << ", " << pos.y << "), (" << vel.dx << ", " << vel.dy << ")" << std::endl;
 
 }
+*/
 ECS::ECS()
 {
 	/*

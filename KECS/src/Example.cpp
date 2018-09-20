@@ -8,12 +8,14 @@
 
 void Example::Draw()
 {
-	std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Rect>();
+	//std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Rect>();
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Rect>();
+
 	for (int entityIndex : entities)
 	{
 		//Render red filled quad 
-		Rect rect = ComponentManager::GetComponent<Rect>(entityIndex);
-		Position pos = ComponentManager::GetComponent<Position>(entityIndex);
+		Rect rect = EntityManager::GetComponent<Rect>(entityIndex);
+		Position pos = EntityManager::GetComponent<Position>(entityIndex);
 		SDL_Rect fillRect = { pos.x + rect.offsetX, pos.y + rect.offsetY, rect.width, rect.height };
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &fillRect);
@@ -22,19 +24,19 @@ void Example::Draw()
 
 void Example::Physics()
 {
-	std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Velocity>();
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity>();
 	for (int entityIndex : entities)
 	{
-		Position pos = ComponentManager::GetComponent<Position>(entityIndex);
-		Velocity vel = ComponentManager::GetComponent<Velocity>(entityIndex);
+		Position pos = EntityManager::GetComponent<Position>(entityIndex);
+		Velocity vel = EntityManager::GetComponent<Velocity>(entityIndex);
 		pos.x += vel.dx;
 		pos.y += vel.dy;
-		ComponentManager::SetComponent<Position>(entityIndex, pos);
+		EntityManager::SetComponent<Position>(entityIndex, pos);
 	}
 }
 void Example::Test()
 {
-	std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Velocity>();
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity>();
 	for (int entityIndex : entities)
 	{
 		std::cout << "Test funtion " << entityIndex << std::endl;
@@ -45,8 +47,8 @@ Example::Example(int screenWidth, int screenHeight)
 {
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
+	//EntityManager::SetUpComponents<Position, Velocity, Rect>();
 	EntityManager::SetUpComponents<Position, Velocity, Rect>();
-	ComponentManager::SetUpComponents<Position, Velocity, Rect>();
 }
 
 
@@ -62,16 +64,16 @@ void Example::Run()
 		bool quit = false;
 		SDL_Event e;
 		int ent0 = EntityManager::CreateEntity();
-		ComponentManager::AddComponent<Position>(ent0);
-		ComponentManager::AddComponent<Rect>(ent0);
-		ComponentManager::AddComponent<Velocity>(ent0);
+		EntityManager::AddComponent<Position>(ent0);
+		EntityManager::AddComponent<Rect>(ent0);
+		EntityManager::AddComponent<Velocity>(ent0);
 		Rect rect;
 		rect.width = 50;
 		rect.height = 50;
 		rect.offsetX = -rect.width / 2;
 		rect.offsetY = -rect.height / 2;
 
-		ComponentManager::SetComponent<Rect>(ent0, rect);
+		EntityManager::SetComponent<Rect>(ent0, rect);
 
 		while (!quit)
 		{
@@ -111,7 +113,7 @@ void Example::Run()
 			Velocity newVelocity;
 			newVelocity.dx = dx;
 			newVelocity.dy = dy;
-			ComponentManager::SetComponent<Velocity>(ent0, newVelocity);
+			EntityManager::SetComponent<Velocity>(ent0, newVelocity);
 			Physics();
 			Draw();
 			//System::Run<Position, Velocity>([this](int x) {Physics(x); });

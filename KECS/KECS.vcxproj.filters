@@ -21,9 +21,6 @@
     <ClCompile Include="src\ECS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Entity.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Example.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -35,16 +32,10 @@
     <ClInclude Include="include\EntityManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\ComponentManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Components\c_position.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Components\c_velocity.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Entity.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Stack.h">
