@@ -45,6 +45,7 @@ Example::Example(int screenWidth, int screenHeight)
 {
 	this->screenWidth = screenWidth;
 	this->screenHeight = screenHeight;
+	EntityManager::SetUpComponents<Position, Velocity, Rect>();
 	ComponentManager::SetUpComponents<Position, Velocity, Rect>();
 }
 
@@ -60,9 +61,7 @@ void Example::Run()
 	{
 		bool quit = false;
 		SDL_Event e;
-		EntityManager em(5);
-		ComponentManager::em = &em;
-		int ent0 = em.CreateEntity();
+		int ent0 = EntityManager::CreateEntity();
 		ComponentManager::AddComponent<Position>(ent0);
 		ComponentManager::AddComponent<Rect>(ent0);
 		ComponentManager::AddComponent<Velocity>(ent0);

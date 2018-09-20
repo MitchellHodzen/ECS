@@ -135,7 +135,6 @@
   <ItemGroup>
     <ClCompile Include="src\Example.cpp" />
     <ClCompile Include="src\Entity.cpp" />
-    <ClCompile Include="src\EntityManager.cpp" />
     <ClCompile Include="src\ECS.cpp" />
     <ClCompile Include="src\Entry.cpp" />
   </ItemGroup>

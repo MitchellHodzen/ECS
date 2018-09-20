@@ -1,4 +1,5 @@
 #pragma once
+
 //#define COMPONENT_COUNT 3
 //try to implement bitset?
 
@@ -14,7 +15,6 @@ class ComponentManager
 {
 public:
 
-	static inline EntityManager* em;
 
 	template<typename T, typename... Args> static void SetUpComponents()
 	{
@@ -31,7 +31,7 @@ public:
 	}
 	template<typename T> static void AddComponent(int entityIndex)
 	{
-		if (em->IsValidEntityIndex(entityIndex) && !HasComponent<T>(entityIndex))
+		if (EntityManager::IsValidEntityIndex(entityIndex) && !HasComponent<T>(entityIndex))
 		{
 			std::cout << "Adding entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
 			UpdateEntityComponent<T>(entityIndex, true);
@@ -48,7 +48,7 @@ public:
 	}
 	template<typename T> static void RemoveComponent(int entityIndex)
 	{
-		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+		if (EntityManager::IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
 		{
 			std::cout << "Removing entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
 			UpdateEntityComponent<T>(entityIndex, false);
@@ -62,7 +62,7 @@ public:
 	}
 	template<typename T> static bool HasComponent(int entityIndex)
 	{
-		if (em->IsValidEntityIndex(entityIndex))
+		if (EntityManager::IsValidEntityIndex(entityIndex))
 		{
 			return entityComponentFlags<T>[entityIndex];
 		}
@@ -72,9 +72,9 @@ public:
 	template<typename... Components> static std::vector<int> GetEntitiesWithComponent()
 	{
 		std::vector<int> vec;
-		for (int i = 0; i <= em->GetTopEntityIndex(); ++i)
+		for (int i = 0; i <= EntityManager::GetTopEntityIndex(); ++i)
 		{
-			if (em->IsValidEntityIndex(i) && HasComponent<Components...>(i))
+			if (EntityManager::IsValidEntityIndex(i) && HasComponent<Components...>(i))
 			{
 				vec.push_back(i);
 			}
@@ -85,7 +85,7 @@ public:
 	//Template function to get an entities component 
 	template<typename T> static T GetComponent(int entityIndex)
 	{
-		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+		if (EntityManager::IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
 		{
 			return componentArray<T>[entityIndex];
 		}
@@ -94,7 +94,7 @@ public:
 	//Template function to set an entities component
 	template<typename T> static void SetComponent(int entityIndex, T value)
 	{
-		if (em->IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+		if (EntityManager::IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
 		{
 			componentArray<T>[entityIndex] = value;
 		}
