@@ -31,6 +31,10 @@ int EntityManager::CreateEntity()
 	{
 		int entityIndex = availableEntityIndicies->Pop();
 		SetValidEntityIndex(entityIndex, true);
+		if (entityIndex > topEntityIndex)
+		{
+			topEntityIndex = entityIndex;
+		}
 		return entityIndex;
 	}
 	else
@@ -79,4 +83,9 @@ bool EntityManager::IsValidEntityIndex(int entityIndex)
 int EntityManager::GetMaxEntities()
 {
 	return maxEntities;
+}
+
+int EntityManager::GetTopEntityIndex()
+{
+	return topEntityIndex;
 }

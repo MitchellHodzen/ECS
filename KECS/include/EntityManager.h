@@ -12,8 +12,10 @@ public:
 	void PrintValidEntities();
 	bool IsValidEntityIndex(int entityIndex);
 	int GetMaxEntities();
+	int GetTopEntityIndex();
 private:
 	int maxEntities = 0;
+	int topEntityIndex = 0;
 	Stack<int>* availableEntityIndicies;
 	bool* validEntityIndicies;
 	int entityCount = 0;

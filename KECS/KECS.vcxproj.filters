@@ -56,9 +56,6 @@
     <ClInclude Include="include\Components\c_test.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\System.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="include\Example.h">
       <Filter>Header Files</Filter>
     </ClInclude>

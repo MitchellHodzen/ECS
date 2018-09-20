@@ -3,13 +3,13 @@ struct Rect
 {
 	Rect()
 	{
-		posX = 0;
-		posY = 0;
+		offsetX = 0;
+		offsetY = 0;
 		width = 0; 
 		height = 0;
 	};
-	int posX;
-	int posY;
+	int offsetX;
+	int offsetY;
 	int width;
 	int height;
 };

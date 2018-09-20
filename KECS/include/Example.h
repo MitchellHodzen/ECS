@@ -15,8 +15,9 @@ private:
 	SDL_Surface* screenSurface = nullptr;
 	SDL_Renderer* renderer = nullptr; 
 	SDL_Texture* texture = nullptr;
-	void Draw(int entityIndex);
-	void Physics(int entityIndex);
+	void Draw();
+	void Physics();
+	static void Test();
 
 };
 

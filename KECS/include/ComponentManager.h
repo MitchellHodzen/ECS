@@ -8,6 +8,7 @@
 #include "EntityManager.h"
 #include "Components/c_position.h"
 #include "Components/c_velocity.h"
+#include <vector>
 
 class ComponentManager
 {
@@ -66,6 +67,19 @@ public:
 			return entityComponentFlags<T>[entityIndex];
 		}
 		return false;
+	}
+
+	template<typename... Components> static std::vector<int> GetEntitiesWithComponent()
+	{
+		std::vector<int> vec;
+		for (int i = 0; i <= em->GetTopEntityIndex(); ++i)
+		{
+			if (em->IsValidEntityIndex(i) && HasComponent<Components...>(i))
+			{
+				vec.push_back(i);
+			}
+		}
+		return vec;
 	}
 
 	//Template function to get an entities component 

@@ -6,23 +6,39 @@
 #include "Components/c_rect.h"
 
 
-void Example::Draw(int entityIndex)
+void Example::Draw()
 {
-	//Render red filled quad 
-	Rect rect = ComponentManager::GetComponent<Rect>(entityIndex);
-	Position pos = ComponentManager::GetComponent<Position>(entityIndex);
-	SDL_Rect fillRect = { pos.x, pos.y, rect.width, rect.height }; 
-	SDL_SetRenderDrawColor( renderer, 0xFF, 0x00, 0x00, 0xFF ); 
-	SDL_RenderFillRect( renderer, &fillRect );
+	std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Rect>();
+	for (int entityIndex : entities)
+	{
+		//Render red filled quad 
+		Rect rect = ComponentManager::GetComponent<Rect>(entityIndex);
+		Position pos = ComponentManager::GetComponent<Position>(entityIndex);
+		SDL_Rect fillRect = { pos.x + rect.offsetX, pos.y + rect.offsetY, rect.width, rect.height };
+		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
+		SDL_RenderFillRect(renderer, &fillRect);
+	}
 }
 
-void Example::Physics(int entityIndex)
+void Example::Physics()
 {
-	Position pos = ComponentManager::GetComponent<Position>(entityIndex);
-	Velocity vel = ComponentManager::GetComponent<Velocity>(entityIndex);
-	pos.x += vel.dx;
-	pos.y += vel.dy;
-	ComponentManager::SetComponent<Position>(entityIndex, pos);
+	std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Velocity>();
+	for (int entityIndex : entities)
+	{
+		Position pos = ComponentManager::GetComponent<Position>(entityIndex);
+		Velocity vel = ComponentManager::GetComponent<Velocity>(entityIndex);
+		pos.x += vel.dx;
+		pos.y += vel.dy;
+		ComponentManager::SetComponent<Position>(entityIndex, pos);
+	}
+}
+void Example::Test()
+{
+	std::vector<int> entities = ComponentManager::GetEntitiesWithComponent<Position, Velocity>();
+	for (int entityIndex : entities)
+	{
+		std::cout << "Test funtion " << entityIndex << std::endl;
+	}
 }
 
 Example::Example(int screenWidth, int screenHeight)
@@ -51,10 +67,11 @@ void Example::Run()
 		ComponentManager::AddComponent<Rect>(ent0);
 		ComponentManager::AddComponent<Velocity>(ent0);
 		Rect rect;
-		rect.posX = 200;
-		rect.posY = 200;
 		rect.width = 50;
 		rect.height = 50;
+		rect.offsetX = -rect.width / 2;
+		rect.offsetY = -rect.height / 2;
+
 		ComponentManager::SetComponent<Rect>(ent0, rect);
 
 		while (!quit)
@@ -96,8 +113,11 @@ void Example::Run()
 			newVelocity.dx = dx;
 			newVelocity.dy = dy;
 			ComponentManager::SetComponent<Velocity>(ent0, newVelocity);
-			System::Run<Position, Velocity>([this](int x) {Physics(x); });
-			System::Run<Position, Rect>([this](int x){Draw(x); });
+			Physics();
+			Draw();
+			//System::Run<Position, Velocity>([this](int x) {Physics(x); });
+			//System::Run<Position, Rect>([this](int x) {Draw(x); });
+			//System::Run<Position, Velocity>([](int x) {Example::Test(x); });
 			SDL_RenderPresent( renderer );
 		}
 		CloseSDL();
