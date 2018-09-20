@@ -95,37 +95,73 @@ public:
 	//Template function to add a component 
 	template<typename T, typename... Args> static void AddComponent(int entityIndex)
 	{
-		ComponentManager::AddComponent<T, Args...>(entityIndex);
+		if (IsValidEntityIndex(entityIndex))
+		{
+			ComponentManager::AddComponent<T, Args...>(entityIndex);
+		}
+		else
+		{
+			std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot add component" << std::endl;
+		}
 	}
 
 	//Template function to remove a component 
 	template<typename T, typename... Args> static void RemoveComponent(int entityIndex)
 	{
-		ComponentManager::RemoveComponent<T, Args...>(entityIndex);
+		if (IsValidEntityIndex(entityIndex))
+		{
+			ComponentManager::RemoveComponent<T, Args...>(entityIndex);
+		}
+		else
+		{
+			std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot remove component" << std::endl;
+		}
 	}
 
 	//Template function to check if an entity has a component
 	template<typename T, typename... Args> static bool HasComponent(int entityIndex)
 	{
-		return ComponentManager::HasComponent<T, Args...>(entityIndex);
+		if (IsValidEntityIndex(entityIndex))
+		{
+			return ComponentManager::HasComponent<T, Args...>(entityIndex);
+		}
+		std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot check component" << std::endl;
+		return false;
 	}
 
 	//Template function to get an entities component 
 	template<typename T> static T GetComponent(int entityIndex)
 	{
-		return ComponentManager::GetComponent<T>(entityIndex);
+		if (IsValidEntityIndex(entityIndex))
+		{
+			return ComponentManager::GetComponent<T>(entityIndex);
+		}
+		std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot get component. Returning nonsense" << std::endl;
+
 	}
 
 	//Template function to set an entities component
 	template<typename T> static void SetComponent(int entityIndex, T value)
 	{
-		ComponentManager::SetComponent<T>(entityIndex, value);
+		if (IsValidEntityIndex(entityIndex))
+		{
+			ComponentManager::SetComponent<T>(entityIndex, value);
+		}
 	}
 
 
+	//Template function to get all entities which contain a set of components
 	template<typename... Components> static std::vector<int> GetEntitiesWithComponent()
 	{
-		return ComponentManager::GetEntitiesWithComponent<Components...>();
+		std::vector<int> vec;
+		for (int i = 0; i <= GetTopEntityIndex(); ++i)
+		{
+			if (IsValidEntityIndex(i) && ComponentManager::HasComponent<Components...>(i))
+			{
+				vec.push_back(i);
+			}
+		}
+		return vec;
 	}
 
 private:
@@ -161,7 +197,7 @@ private:
 		}
 		template<typename T> static void AddComponent(int entityIndex)
 		{
-			if (EntityManager::IsValidEntityIndex(entityIndex) && !HasComponent<T>(entityIndex))
+			if (!HasComponent<T>(entityIndex))
 			{
 				std::cout << "Adding entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
 				UpdateEntityComponent<T>(entityIndex, true);
@@ -178,7 +214,7 @@ private:
 		}
 		template<typename T> static void RemoveComponent(int entityIndex)
 		{
-			if (EntityManager::IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+			if (HasComponent<T>(entityIndex))
 			{
 				std::cout << "Removing entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
 				UpdateEntityComponent<T>(entityIndex, false);
@@ -192,39 +228,23 @@ private:
 		}
 		template<typename T> static bool HasComponent(int entityIndex)
 		{
-			if (EntityManager::IsValidEntityIndex(entityIndex))
-			{
-				return entityComponentFlags<T>[entityIndex];
-			}
-			return false;
-		}
-
-		template<typename... Components> static std::vector<int> GetEntitiesWithComponent()
-		{
-			std::vector<int> vec;
-			for (int i = 0; i <= EntityManager::GetTopEntityIndex(); ++i)
-			{
-				if (EntityManager::IsValidEntityIndex(i) && HasComponent<Components...>(i))
-				{
-					vec.push_back(i);
-				}
-			}
-			return vec;
+			return entityComponentFlags<T>[entityIndex];
 		}
 
 		//Template function to get an entities component 
 		template<typename T> static T GetComponent(int entityIndex)
 		{
-			if (EntityManager::IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+			if (HasComponent<T>(entityIndex))
 			{
 				return componentArray<T>[entityIndex];
 			}
+			std::cout << "Entity " << entityIndex << " does not have that component. Cannot get component. Returning nonsense" << std::endl;
 		}
 
 		//Template function to set an entities component
 		template<typename T> static void SetComponent(int entityIndex, T value)
 		{
-			if (EntityManager::IsValidEntityIndex(entityIndex) && HasComponent<T>(entityIndex))
+			if (HasComponent<T>(entityIndex))
 			{
 				componentArray<T>[entityIndex] = value;
 			}

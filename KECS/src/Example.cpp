@@ -74,7 +74,6 @@ void Example::Run()
 		rect.offsetY = -rect.height / 2;
 
 		EntityManager::SetComponent<Rect>(ent0, rect);
-
 		while (!quit)
 		{
 			int dx = 0;
