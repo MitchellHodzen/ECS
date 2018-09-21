@@ -138,6 +138,7 @@
     <ClCompile Include="src\Entry.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Components\c_input.h" />
     <ClInclude Include="include\Components\c_rect.h" />
     <ClInclude Include="include\Example.h" />
     <ClInclude Include="include\Components\c_test.h" />

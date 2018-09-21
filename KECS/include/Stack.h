@@ -8,6 +8,12 @@ public:
 		this->size = size;
 		length = 0;
 	}
+	Stack()
+	{
+		internalArray = new T[25];
+		this->size = 25;
+		length = 0;
+	}
 	~Stack()
 	{
 		delete[] internalArray;

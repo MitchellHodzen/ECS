@@ -17,6 +17,9 @@ private:
 	SDL_Texture* texture = nullptr;
 	void Draw();
 	void Physics();
+	void GetUserInput();
+	void HandleUserInput();
 	static void Test();
+	bool quit;
 };
 

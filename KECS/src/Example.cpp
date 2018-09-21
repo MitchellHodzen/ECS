@@ -5,6 +5,7 @@
 #include "Components/c_velocity.h"
 #include "Components/c_rect.h"
 #include "Tags.h"
+#include "Components/c_input.h"
 
 void Example::Draw()
 {
@@ -33,6 +34,92 @@ void Example::Physics()
 		EntityManager::SetComponent<Position>(entityIndex, pos);
 	}
 }
+
+void Example::GetUserInput()
+{
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<UserInput>();
+	SDL_Event e;
+	while (SDL_PollEvent(&e) != 0)
+	{
+		//For every entity which captures user input, record user input
+		for (int entityIndex : entities)
+		{
+			UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
+			if (e.type == SDL_QUIT)
+			{
+				uin.inputStack.push(UserInput::InputType::CLOSE);
+			}
+			else if (e.type == SDL_KEYDOWN)
+			{
+				//Select surfaces based on key press 
+				switch (e.key.keysym.sym)
+				{
+				case SDLK_UP:
+					uin.inputStack.push(UserInput::InputType::UP);
+					break;
+				case SDLK_DOWN:
+					uin.inputStack.push(UserInput::InputType::DOWN);
+					break;
+				case SDLK_LEFT:
+					uin.inputStack.push(UserInput::InputType::LEFT);
+					break;
+				case SDLK_RIGHT:
+					uin.inputStack.push(UserInput::InputType::RIGHT);
+					break;
+				default:
+					break;
+				}
+			}
+			EntityManager::SetComponent<UserInput>(entityIndex, uin);
+		}
+		
+	}
+
+}
+void Example::HandleUserInput()
+{
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Velocity, UserInput>();
+	
+	for (int entityIndex : entities)
+	{
+
+		Velocity vel;
+		UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
+
+		while (!uin.inputStack.empty())
+		{
+			int val = uin.inputStack.top();
+			uin.inputStack.pop();
+			switch (val)
+			{
+				case UserInput::InputType::CLOSE:
+					quit = true;
+					break;
+				case UserInput::InputType::UP:
+					vel.dy -= 5;
+					std::cout << "pressing up" << std::endl;
+					std::cout << EntityManager::GetComponent<Velocity>(entityIndex).dy << std::endl;
+					std::cout << vel.dy << std::endl;
+					break;
+				case UserInput::InputType::DOWN:
+					vel.dy += 5;
+					break;
+				case UserInput::InputType::LEFT:
+					vel.dx -= 5;
+					break;
+				case UserInput::InputType::RIGHT:
+					vel.dx += 5;
+					break;
+			}
+		}
+
+		EntityManager::SetComponent<Velocity>(entityIndex, vel);
+		EntityManager::SetComponent<UserInput>(entityIndex, uin);
+
+
+	}
+	
+}
 void Example::Test()
 {
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity>();
@@ -58,16 +145,15 @@ void Example::Run()
 	//Run tests
 	if (InitSDL())
 	{
-		EntityManager::SetUpComponents<Position, Velocity, Rect>();
+		EntityManager::SetUpComponents<Position, Velocity, Rect, UserInput>();
 		EntityManager::SetUpTags<Player, Enemy, Wall>();
 
-		bool quit = false;
-		SDL_Event e;
 		int ent0 = EntityManager::CreateEntity();
 		EntityManager::AddTag<Player>(ent0);
 		EntityManager::AddComponent<Position>(ent0);
 		EntityManager::AddComponent<Rect>(ent0);
 		EntityManager::AddComponent<Velocity>(ent0);
+		EntityManager::AddComponent<UserInput>(ent0);
 		Rect rect;
 		rect.width = 50;
 		rect.height = 50;
@@ -89,63 +175,26 @@ void Example::Run()
 		EntityManager::SetComponent<Rect>(ent1, rect1);
 		EntityManager::AddTag<Enemy>(ent1);
 		EntityManager::AddTag<Wall>(ent1);
-
+		//EntityManager::AddComponent<Velocity>(ent1);
+		//EntityManager::AddComponent<UserInput>(ent1);
 
 		std::cout << "Entity " << ent0 << " is a player: " << EntityManager::HasTag<Player>(ent0) << std::endl;
 		std::cout << "Entity " << ent1 << " is a player: " << EntityManager::HasTag<Player>(ent1) << std::endl;
 		std::cout << "Entity " << ent0 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent0) << std::endl;
 		std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
 
-		EntityManager::DestroyEntity(ent1);
-		ent1 = EntityManager::CreateEntity();
-		std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
-
-
-
-
-
-
+		//EntityManager::DestroyEntity(ent1);
+		//ent1 = EntityManager::CreateEntity();
+		//std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
 
 
 		while (!quit)
 		{
-			int dx = 0;
-			int dy = 0;
-			while (SDL_PollEvent(&e) != 0)
-			{
-				if( e.type == SDL_QUIT )
-				{ 
-					quit = true; 
-				}
-				else if( e.type == SDL_KEYDOWN ) 
-				{ 
-					//Select surfaces based on key press 
-					switch( e.key.keysym.sym ) 
-					{ 
-						case SDLK_UP: 
-							dy -= 5;
-							break; 
-						case SDLK_DOWN: 
-							dy += 5;
-							break; 
-						case SDLK_LEFT: 
-							dx -= 5;
-							break; 
-						case SDLK_RIGHT: 
-							dx += 5;
-							break; 
-						default: 
-							break; 
-					}
-				}
-			}
+			GetUserInput();
+			HandleUserInput();
 			//Clear screen 
 			SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
 			SDL_RenderClear( renderer ); 
-			Velocity newVelocity;
-			newVelocity.dx = dx;
-			newVelocity.dy = dy;
-			EntityManager::SetComponent<Velocity>(ent0, newVelocity);
 			Physics();
 			Draw();
 			SDL_RenderPresent( renderer );
