@@ -50,5 +50,8 @@
     <ClInclude Include="include\Components\c_rect.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\Tags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

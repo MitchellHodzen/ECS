@@ -18,6 +18,5 @@ private:
 	void Draw();
 	void Physics();
 	static void Test();
-
 };
 

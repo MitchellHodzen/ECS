@@ -4,7 +4,7 @@
 #include "Components/c_position.h"
 #include "Components/c_velocity.h"
 #include "Components/c_rect.h"
-
+#include "Tags.h"
 
 void Example::Draw()
 {
@@ -15,7 +15,6 @@ void Example::Draw()
 		//Render red filled quad 
 		Rect rect = EntityManager::GetComponent<Rect>(entityIndex);
 		Position pos = EntityManager::GetComponent<Position>(entityIndex);
-		std::cout << pos.x << " " << pos.y << std::endl;
 		SDL_Rect fillRect = { pos.x + rect.offsetX, pos.y + rect.offsetY, rect.width, rect.height };
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &fillRect);
@@ -60,10 +59,12 @@ void Example::Run()
 	if (InitSDL())
 	{
 		EntityManager::SetUpComponents<Position, Velocity, Rect>();
+		EntityManager::SetUpTags<Player, Enemy, Wall>();
 
 		bool quit = false;
 		SDL_Event e;
 		int ent0 = EntityManager::CreateEntity();
+		EntityManager::AddTag<Player>(ent0);
 		EntityManager::AddComponent<Position>(ent0);
 		EntityManager::AddComponent<Rect>(ent0);
 		EntityManager::AddComponent<Velocity>(ent0);
@@ -86,6 +87,23 @@ void Example::Run()
 		rect1.width = 100;
 		rect1.height = 75;
 		EntityManager::SetComponent<Rect>(ent1, rect1);
+		EntityManager::AddTag<Enemy>(ent1);
+		EntityManager::AddTag<Wall>(ent1);
+
+
+		std::cout << "Entity " << ent0 << " is a player: " << EntityManager::HasTag<Player>(ent0) << std::endl;
+		std::cout << "Entity " << ent1 << " is a player: " << EntityManager::HasTag<Player>(ent1) << std::endl;
+		std::cout << "Entity " << ent0 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent0) << std::endl;
+		std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
+
+		EntityManager::DestroyEntity(ent1);
+		ent1 = EntityManager::CreateEntity();
+		std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
+
+
+
+
+
 
 
 
