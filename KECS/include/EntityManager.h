@@ -1,12 +1,7 @@
 #pragma once
-#define MAX_ENTITIES 10
 #include "Stack.h"
-
 #include <type_traits>
 #include <iostream>
-#include "EntityManager.h"
-#include "Components/c_position.h"
-#include "Components/c_velocity.h"
 #include <vector>
 
 class EntityManager
@@ -18,6 +13,7 @@ public:
 		if (entityCount < MAX_ENTITIES)
 		{
 			int entityIndex = availableEntityIndicies->Pop();
+			ComponentManager::ClearEntityComponents(entityIndex);
 			SetValidEntityIndex(entityIndex, true);
 			if (entityIndex > topEntityIndex)
 			{
@@ -75,6 +71,7 @@ public:
 	//Component manager wrappers
 	template<typename T, typename... Args> static void SetUpComponents()
 	{
+
 		//Set up avaiable entities
 		availableEntityIndicies = new Stack<int>(MAX_ENTITIES);
 		for (int i = MAX_ENTITIES - 1; i >= 0; --i)
@@ -88,6 +85,7 @@ public:
 		{
 			validEntityIndicies[i] = false;
 		}
+
 
 		ComponentManager::SetUpComponents<T, Args...>();
 	}
@@ -185,6 +183,18 @@ private:
 		template<typename T, typename... Args> static void SetUpComponents()
 		{
 			//ComponentManager::COMPONENT_COUNT = 1 + sizeof...(Args);
+
+			componentCount = 1 + sizeof...(Args);
+			entityComponentKeys = new bool*[MAX_ENTITIES];
+			for (int i = 0; i < MAX_ENTITIES; ++i)
+			{
+				entityComponentKeys[i] = new bool[componentCount];
+				for (int j = 0; j < componentCount; ++j)
+				{
+					entityComponentKeys[i][j] = false;
+				}
+
+			}
 			SetComponentValues<T, Args...>(0);
 		}
 
@@ -228,7 +238,7 @@ private:
 		}
 		template<typename T> static bool HasComponent(int entityIndex)
 		{
-			return entityComponentFlags<T>[entityIndex];
+			return entityComponentKeys[entityIndex][componentIndex<T>];//entityComponentFlags<T>[entityIndex];
 		}
 
 		//Template function to get an entities component 
@@ -250,14 +260,23 @@ private:
 			}
 		}
 
+		static void ClearEntityComponents(int entityIndex)
+		{
+			for (int i = 0; i < componentCount; ++i)
+			{
+				entityComponentKeys[entityIndex][i] = false;
+			}
+		}
+
 	private:
 		ComponentManager() {};
 		~ComponentManager() {};
 		//std::bitset<std::as_const<const int>(COMPONENT_COUNT)>* entityKeyArray = new std::bitset<const_cast<COMPONENT_COUNT>>[MAX_ENTITIES];
-
+		static inline int componentCount = 0;
 		template<typename T> static inline T* componentArray = nullptr;
 		template<typename T> static inline int componentIndex = 0;
 		template<typename T> static inline bool* entityComponentFlags = nullptr;
+		static inline bool** entityComponentKeys = nullptr;
 
 		//Template function for setting up components
 		template<typename T, typename S, typename... Args> static void SetComponentValues(int index)
@@ -279,7 +298,8 @@ private:
 		//Set the flag for whether an entity has or doesn't have a component
 		template<typename T> static void UpdateEntityComponent(int entityIndex, bool value)
 		{
-			entityComponentFlags<T>[entityIndex] = value;
+			entityComponentKeys[entityIndex][componentIndex<T>] = value;
+			//entityComponentFlags<T>[entityIndex] = value;
 		}
 	};
 };
