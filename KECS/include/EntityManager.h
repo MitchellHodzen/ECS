@@ -14,7 +14,7 @@ public:
 		{
 			int entityIndex = availableEntityIndicies->Pop();
 			ComponentManager::ClearEntityComponents(entityIndex);
-			ComponentManager::ClearEntityTags(entityIndex);
+			TagManager::ClearEntityTags(entityIndex);
 			SetValidEntityIndex(entityIndex, true);
 			if (entityIndex > topEntityIndex)
 			{
@@ -165,7 +165,7 @@ public:
 	//Function wrappers for tags
 	template<typename T, typename... Args> static void SetUpTags()
 	{
-		ComponentManager::SetUpTags<T, Args...>();
+		TagManager::SetUpTags<T, Args...>();
 	}
 
 	//Template function to add a component 
@@ -173,7 +173,7 @@ public:
 	{
 		if (IsValidEntityIndex(entityIndex))
 		{
-			ComponentManager::AddTag<T, Args...>(entityIndex);
+			TagManager::AddTag<T, Args...>(entityIndex);
 		}
 		else
 		{
@@ -186,7 +186,7 @@ public:
 	{
 		if (IsValidEntityIndex(entityIndex))
 		{
-			ComponentManager::RemoveTag<T, Args...>(entityIndex);
+			TagManager::RemoveTag<T, Args...>(entityIndex);
 		}
 		else
 		{
@@ -199,7 +199,7 @@ public:
 	{
 		if (IsValidEntityIndex(entityIndex))
 		{
-			return ComponentManager::HasTag<T, Args...>(entityIndex);
+			return TagManager::HasTag<T, Args...>(entityIndex);
 		}
 		std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot check tag" << std::endl;
 		return false;
@@ -322,6 +322,44 @@ private:
 			}
 		}
 
+	private:
+
+		static inline int componentCount = 0;
+
+		template<typename T> static inline T* componentArray = nullptr;
+		template<typename T> static inline int componentIndex = 0;
+		static inline bool** entityComponentKeys = nullptr;
+
+		//Template function for setting up components
+		template<typename T, typename S, typename... Args> static void SetComponentValues(int index)
+		{
+			SetComponentValues<T>(index);
+			SetComponentValues<S, Args...>(++index);
+		}
+		template<typename T> static void SetComponentValues(int index)
+		{
+			componentIndex<T> = index;
+			componentArray<T> = new T[MAX_ENTITIES];
+		}
+
+
+
+		//Set the flag for whether an entity has or doesn't have a component
+		template<typename T> static void UpdateEntityComponent(int entityIndex, bool value)
+		{
+			entityComponentKeys[entityIndex][componentIndex<T>] = value;
+			//entityComponentFlags<T>[entityIndex] = value;
+		}
+
+	};
+
+
+
+
+	//Privately define tag manager. Separate tag related functions to be easier to understand 
+	class TagManager
+	{
+	public:
 
 		template<typename T, typename... Args> static void SetUpTags()
 		{
@@ -349,7 +387,7 @@ private:
 		template<typename T> static void AddTag(int entityIndex)
 		{
 			std::cout << "Adding entity " << entityIndex << "'s " << typeid(T).name() << " tag" << std::endl;
-			UpdateEntityTag<T>(entityIndex, true);			
+			UpdateEntityTag<T>(entityIndex, true);
 		}
 
 		//Template function to remove a tag 
@@ -384,27 +422,10 @@ private:
 		}
 
 	private:
-
-		static inline int componentCount = 0;
 		static inline int tagCount = 0;
 
-		template<typename T> static inline T* componentArray = nullptr;
-		template<typename T> static inline int componentIndex = 0;
 		template<typename T> static inline int tagIndex = 0;
-		static inline bool** entityComponentKeys = nullptr;
 		static inline bool** entityTagKeys = nullptr;
-
-		//Template function for setting up components
-		template<typename T, typename S, typename... Args> static void SetComponentValues(int index)
-		{
-			SetComponentValues<T>(index);
-			SetComponentValues<S, Args...>(++index);
-		}
-		template<typename T> static void SetComponentValues(int index)
-		{
-			componentIndex<T> = index;
-			componentArray<T> = new T[MAX_ENTITIES];
-		}
 
 		//Template function for setting up tags
 		template<typename T, typename S, typename... Args> static void SetTagValues(int index)
@@ -415,14 +436,6 @@ private:
 		template<typename T> static void SetTagValues(int index)
 		{
 			tagIndex<T> = index;
-		}
-
-
-		//Set the flag for whether an entity has or doesn't have a component
-		template<typename T> static void UpdateEntityComponent(int entityIndex, bool value)
-		{
-			entityComponentKeys[entityIndex][componentIndex<T>] = value;
-			//entityComponentFlags<T>[entityIndex] = value;
 		}
 
 		//Set the flag for whether an entity has or doesn't have a tag
