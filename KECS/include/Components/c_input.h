@@ -7,9 +7,12 @@ struct UserInput
 
 	UserInput()
 	{
-		inputStack = std::stack<int, std::vector<int>>();
+		for (int i = 0; i < 4; ++i)
+		{
+			keyStates[i] = false;
+		}
 	}
 
-	std::stack<int, std::vector<int>> inputStack;
+	bool keyStates[4];
 
 };

@@ -6,9 +6,12 @@
 #include "Components/c_rect.h"
 #include "Tags.h"
 #include "Components/c_input.h"
+#include "Components/c_friction.h"
 
 void Example::Draw()
 {
+	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	SDL_RenderClear(renderer);
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Rect>();
 
 	for (int entityIndex : entities)
@@ -20,60 +23,103 @@ void Example::Draw()
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &fillRect);
 	}
+	SDL_RenderPresent(renderer);
 }
 
 void Example::Physics()
 {
-	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity>();
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Friction>();
 	for (int entityIndex : entities)
 	{
 		Position pos = EntityManager::GetComponent<Position>(entityIndex);
 		Velocity vel = EntityManager::GetComponent<Velocity>(entityIndex);
+		Friction frict = EntityManager::GetComponent<Friction>(entityIndex);
+		if (vel.dx > 0)
+		{
+			vel.dx -= frict.amountX;
+			if (vel.dx < 0)
+			{
+				vel.dx = 0;
+			}
+		}
+		else if (vel.dx < 0)
+		{
+			vel.dx += frict.amountX;
+			if (vel.dx > 0)
+			{
+				vel.dx = 0;
+			}
+		}
+
+		if (vel.dy > 0)
+		{
+			vel.dy -= frict.amountY;
+			if (vel.dy < 0)
+			{
+				vel.dy = 0;
+			}
+		}
+		else if (vel.dy < 0)
+		{
+			vel.dy += frict.amountY;
+			if (vel.dy > 0)
+			{
+				vel.dy = 0;
+			}
+		}
 		pos.x += vel.dx;
 		pos.y += vel.dy;
+		//std::cout << vel.dx << ", " << vel.dy << std::endl;
 		EntityManager::SetComponent<Position>(entityIndex, pos);
+		EntityManager::SetComponent<Velocity>(entityIndex, vel);
 	}
 }
 
 void Example::GetUserInput()
 {
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<UserInput>();
-	SDL_Event e;
-	while (SDL_PollEvent(&e) != 0)
+
+	//For every entity which captures user input, record user input
+	for (int entityIndex : entities)
 	{
-		//For every entity which captures user input, record user input
-		for (int entityIndex : entities)
+		UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
+
+		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL); 
+		if (currentKeyStates[SDL_SCANCODE_UP]) 
 		{
-			UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
-			if (e.type == SDL_QUIT)
-			{
-				uin.inputStack.push(UserInput::InputType::CLOSE);
-			}
-			else if (e.type == SDL_KEYDOWN)
-			{
-				//Select surfaces based on key press 
-				switch (e.key.keysym.sym)
-				{
-				case SDLK_UP:
-					uin.inputStack.push(UserInput::InputType::UP);
-					break;
-				case SDLK_DOWN:
-					uin.inputStack.push(UserInput::InputType::DOWN);
-					break;
-				case SDLK_LEFT:
-					uin.inputStack.push(UserInput::InputType::LEFT);
-					break;
-				case SDLK_RIGHT:
-					uin.inputStack.push(UserInput::InputType::RIGHT);
-					break;
-				default:
-					break;
-				}
-			}
-			EntityManager::SetComponent<UserInput>(entityIndex, uin);
+			uin.keyStates[UserInput::InputType::UP] = true;
 		}
-		
+		else
+		{
+			uin.keyStates[UserInput::InputType::UP] = false;
+		}
+		if (currentKeyStates[SDL_SCANCODE_DOWN])
+		{ 
+			uin.keyStates[UserInput::InputType::DOWN] = true;
+		}
+		else
+		{
+			uin.keyStates[UserInput::InputType::DOWN] = false;
+		}
+		if (currentKeyStates[SDL_SCANCODE_LEFT]) 
+		{ 
+			uin.keyStates[UserInput::InputType::LEFT] = true;
+		}
+		else
+		{
+			uin.keyStates[UserInput::InputType::LEFT] = false;
+		}
+		if (currentKeyStates[SDL_SCANCODE_RIGHT]) 
+		{ 
+			uin.keyStates[UserInput::InputType::RIGHT] = true;
+		}
+		else
+		{
+			uin.keyStates[UserInput::InputType::RIGHT] = false;
+		}
+		EntityManager::SetComponent<UserInput>(entityIndex, uin);
 	}
+		
 
 }
 void Example::HandleUserInput()
@@ -82,35 +128,24 @@ void Example::HandleUserInput()
 	
 	for (int entityIndex : entities)
 	{
-
-		Velocity vel;
+		Velocity vel = EntityManager::GetComponent<Velocity>(entityIndex);
 		UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
-
-		while (!uin.inputStack.empty())
+		float speed = .002f;
+		if (uin.keyStates[UserInput::InputType::UP])
 		{
-			int val = uin.inputStack.top();
-			uin.inputStack.pop();
-			switch (val)
-			{
-				case UserInput::InputType::CLOSE:
-					quit = true;
-					break;
-				case UserInput::InputType::UP:
-					vel.dy -= 5;
-					std::cout << "pressing up" << std::endl;
-					std::cout << EntityManager::GetComponent<Velocity>(entityIndex).dy << std::endl;
-					std::cout << vel.dy << std::endl;
-					break;
-				case UserInput::InputType::DOWN:
-					vel.dy += 5;
-					break;
-				case UserInput::InputType::LEFT:
-					vel.dx -= 5;
-					break;
-				case UserInput::InputType::RIGHT:
-					vel.dx += 5;
-					break;
-			}
+			vel.dy -= speed;
+		}
+		if (uin.keyStates[UserInput::InputType::DOWN])
+		{
+			vel.dy += speed;
+		}
+		if (uin.keyStates[UserInput::InputType::LEFT])
+		{
+			vel.dx -= speed;
+		}
+		if (uin.keyStates[UserInput::InputType::RIGHT])
+		{
+			vel.dx += speed;
 		}
 
 		EntityManager::SetComponent<Velocity>(entityIndex, vel);
@@ -145,7 +180,7 @@ void Example::Run()
 	//Run tests
 	if (InitSDL())
 	{
-		EntityManager::SetUpComponents<Position, Velocity, Rect, UserInput>();
+		EntityManager::SetUpComponents<Position, Velocity, Rect, Friction, UserInput>();
 		EntityManager::SetUpTags<Player, Enemy, Wall>();
 
 		int ent0 = EntityManager::CreateEntity();
@@ -153,6 +188,7 @@ void Example::Run()
 		EntityManager::AddComponent<Position>(ent0);
 		EntityManager::AddComponent<Rect>(ent0);
 		EntityManager::AddComponent<Velocity>(ent0);
+		EntityManager::AddComponent<Friction>(ent0);
 		EntityManager::AddComponent<UserInput>(ent0);
 		Rect rect;
 		rect.width = 50;
@@ -160,6 +196,11 @@ void Example::Run()
 		rect.offsetX = -rect.width / 2;
 		rect.offsetY = -rect.height / 2;
 		EntityManager::SetComponent<Rect>(ent0, rect);
+
+		Friction frict;
+		frict.amountX = .001f;
+		frict.amountY = .001f;
+		EntityManager::SetComponent<Friction>(ent0, frict);
 
 		int ent1 = EntityManager::CreateEntity();
 		EntityManager::AddComponent<Position>(ent1);
@@ -175,8 +216,13 @@ void Example::Run()
 		EntityManager::SetComponent<Rect>(ent1, rect1);
 		EntityManager::AddTag<Enemy>(ent1);
 		EntityManager::AddTag<Wall>(ent1);
-		//EntityManager::AddComponent<Velocity>(ent1);
-		//EntityManager::AddComponent<UserInput>(ent1);
+		EntityManager::AddComponent<Velocity>(ent1);
+		EntityManager::AddComponent<UserInput>(ent1);
+		Friction frict2;
+		frict2.amountX = .0009f;
+		frict2.amountY = .0009f;
+		EntityManager::AddComponent<Friction>(ent1);
+		EntityManager::SetComponent<Friction>(ent1, frict2);
 
 		std::cout << "Entity " << ent0 << " is a player: " << EntityManager::HasTag<Player>(ent0) << std::endl;
 		std::cout << "Entity " << ent1 << " is a player: " << EntityManager::HasTag<Player>(ent1) << std::endl;
@@ -186,18 +232,45 @@ void Example::Run()
 		//EntityManager::DestroyEntity(ent1);
 		//ent1 = EntityManager::CreateEntity();
 		//std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
+		SDL_Event e;
 
 
 		while (!quit)
 		{
+			while (SDL_PollEvent(&e) != 0)
+			{
+				if (e.type == SDL_QUIT)
+				{
+					quit = true;
+				}
+				/*
+				else if (e.type == SDL_KEYDOWN)
+				{
+					//Select surfaces based on key press 
+					switch (e.key.keysym.sym)
+					{
+					case SDLK_UP:
+						uin.inputStack.push(UserInput::InputType::UP);
+						break;
+					case SDLK_DOWN:
+						uin.inputStack.push(UserInput::InputType::DOWN);
+						break;
+					case SDLK_LEFT:
+						uin.inputStack.push(UserInput::InputType::LEFT);
+						break;
+					case SDLK_RIGHT:
+						uin.inputStack.push(UserInput::InputType::RIGHT);
+						break;
+					default:
+						break;
+					}
+				}
+				*/
+			}
 			GetUserInput();
 			HandleUserInput();
-			//Clear screen 
-			SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-			SDL_RenderClear( renderer ); 
 			Physics();
 			Draw();
-			SDL_RenderPresent( renderer );
 		}
 		CloseSDL();
 	}
