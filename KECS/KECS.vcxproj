@@ -149,6 +149,7 @@
     <ClInclude Include="include\ECS.h" />
     <ClInclude Include="include\Stack.h" />
     <ClInclude Include="include\Tags.h" />
+    <ClInclude Include="include\Time.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

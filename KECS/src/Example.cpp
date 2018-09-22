@@ -7,7 +7,7 @@
 #include "Tags.h"
 #include "Components/c_input.h"
 #include "Components/c_friction.h"
-
+#include "Time.h"
 void Example::Draw()
 {
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -36,7 +36,7 @@ void Example::Physics()
 		Friction frict = EntityManager::GetComponent<Friction>(entityIndex);
 		if (vel.dx > 0)
 		{
-			vel.dx -= frict.amountX;
+			vel.dx -= frict.amountX * Time::GetDeltaTime();
 			if (vel.dx < 0)
 			{
 				vel.dx = 0;
@@ -44,7 +44,7 @@ void Example::Physics()
 		}
 		else if (vel.dx < 0)
 		{
-			vel.dx += frict.amountX;
+			vel.dx += frict.amountX * Time::GetDeltaTime();
 			if (vel.dx > 0)
 			{
 				vel.dx = 0;
@@ -53,7 +53,7 @@ void Example::Physics()
 
 		if (vel.dy > 0)
 		{
-			vel.dy -= frict.amountY;
+			vel.dy -= frict.amountY * Time::GetDeltaTime();
 			if (vel.dy < 0)
 			{
 				vel.dy = 0;
@@ -61,14 +61,14 @@ void Example::Physics()
 		}
 		else if (vel.dy < 0)
 		{
-			vel.dy += frict.amountY;
+			vel.dy += frict.amountY * Time::GetDeltaTime();
 			if (vel.dy > 0)
 			{
 				vel.dy = 0;
 			}
 		}
-		pos.x += vel.dx;
-		pos.y += vel.dy;
+		pos.x += vel.dx * Time::GetDeltaTime();
+		pos.y += vel.dy * Time::GetDeltaTime();
 		//std::cout << vel.dx << ", " << vel.dy << std::endl;
 		EntityManager::SetComponent<Position>(entityIndex, pos);
 		EntityManager::SetComponent<Velocity>(entityIndex, vel);
@@ -130,22 +130,22 @@ void Example::HandleUserInput()
 	{
 		Velocity vel = EntityManager::GetComponent<Velocity>(entityIndex);
 		UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
-		float speed = .002f;
+		float speed = 100.0f;
 		if (uin.keyStates[UserInput::InputType::UP])
 		{
-			vel.dy -= speed;
+			vel.dy -= speed * Time::GetDeltaTime();
 		}
 		if (uin.keyStates[UserInput::InputType::DOWN])
 		{
-			vel.dy += speed;
+			vel.dy += speed * Time::GetDeltaTime();
 		}
 		if (uin.keyStates[UserInput::InputType::LEFT])
 		{
-			vel.dx -= speed;
+			vel.dx -= speed * Time::GetDeltaTime();
 		}
 		if (uin.keyStates[UserInput::InputType::RIGHT])
 		{
-			vel.dx += speed;
+			vel.dx += speed * Time::GetDeltaTime();
 		}
 
 		EntityManager::SetComponent<Velocity>(entityIndex, vel);
@@ -198,8 +198,8 @@ void Example::Run()
 		EntityManager::SetComponent<Rect>(ent0, rect);
 
 		Friction frict;
-		frict.amountX = .001f;
-		frict.amountY = .001f;
+		frict.amountX = 20.0f;
+		frict.amountY = 20.0f;
 		EntityManager::SetComponent<Friction>(ent0, frict);
 
 		int ent1 = EntityManager::CreateEntity();
@@ -219,8 +219,8 @@ void Example::Run()
 		EntityManager::AddComponent<Velocity>(ent1);
 		EntityManager::AddComponent<UserInput>(ent1);
 		Friction frict2;
-		frict2.amountX = .0009f;
-		frict2.amountY = .0009f;
+		frict2.amountX = 20.0f;
+		frict2.amountY = 20.0f;
 		EntityManager::AddComponent<Friction>(ent1);
 		EntityManager::SetComponent<Friction>(ent1, frict2);
 
@@ -235,8 +235,18 @@ void Example::Run()
 		SDL_Event e;
 
 
+
+		float deltaTime = 0.0f;
+		Uint32 lastFrameTime = 0;
+		Uint32 currentFrameTime = SDL_GetTicks();
+
+
 		while (!quit)
 		{
+			lastFrameTime = currentFrameTime;
+			currentFrameTime = SDL_GetTicks();
+			Time::CalculateDeltaTime(lastFrameTime, currentFrameTime);
+
 			while (SDL_PollEvent(&e) != 0)
 			{
 				if (e.type == SDL_QUIT)
