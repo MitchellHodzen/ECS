@@ -129,7 +129,7 @@ public:
 	}
 
 	//Template function to get an entities component 
-	template<typename T> static T GetComponent(int entityIndex)
+	template<typename T> static T& GetComponent(int entityIndex)
 	{
 		if (IsValidEntityIndex(entityIndex))
 		{
@@ -295,7 +295,7 @@ private:
 		}
 
 		//Template function to get an entities component 
-		template<typename T> static T GetComponent(int entityIndex)
+		template<typename T> static T& GetComponent(int entityIndex)
 		{
 			if (HasComponent<T>(entityIndex))
 			{

@@ -17,8 +17,8 @@ void Example::Draw()
 	for (int entityIndex : entities)
 	{
 		//Render red filled quad 
-		Rect rect = EntityManager::GetComponent<Rect>(entityIndex);
-		Position pos = EntityManager::GetComponent<Position>(entityIndex);
+		Rect& rect = EntityManager::GetComponent<Rect>(entityIndex);
+		Position& pos = EntityManager::GetComponent<Position>(entityIndex);
 		SDL_Rect fillRect = { pos.x + rect.offsetX, pos.y + rect.offsetY, rect.width, rect.height };
 		SDL_SetRenderDrawColor(renderer, 0xFF, 0x00, 0x00, 0xFF);
 		SDL_RenderFillRect(renderer, &fillRect);
@@ -31,9 +31,9 @@ void Example::Physics()
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Friction>();
 	for (int entityIndex : entities)
 	{
-		Position pos = EntityManager::GetComponent<Position>(entityIndex);
-		Velocity vel = EntityManager::GetComponent<Velocity>(entityIndex);
-		Friction frict = EntityManager::GetComponent<Friction>(entityIndex);
+		Position& pos = EntityManager::GetComponent<Position>(entityIndex);
+		Velocity& vel = EntityManager::GetComponent<Velocity>(entityIndex);
+		Friction& frict = EntityManager::GetComponent<Friction>(entityIndex);
 		if (vel.dx > 0)
 		{
 			vel.dx -= frict.amountX * Time::GetDeltaTime();
@@ -70,8 +70,8 @@ void Example::Physics()
 		pos.x += vel.dx * Time::GetDeltaTime();
 		pos.y += vel.dy * Time::GetDeltaTime();
 		//std::cout << vel.dx << ", " << vel.dy << std::endl;
-		EntityManager::SetComponent<Position>(entityIndex, pos);
-		EntityManager::SetComponent<Velocity>(entityIndex, vel);
+		//EntityManager::SetComponent<Position>(entityIndex, pos);
+		//EntityManager::SetComponent<Velocity>(entityIndex, vel);
 	}
 }
 
@@ -82,7 +82,7 @@ void Example::GetUserInput()
 	//For every entity which captures user input, record user input
 	for (int entityIndex : entities)
 	{
-		UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
+		UserInput& uin = EntityManager::GetComponent<UserInput>(entityIndex);
 
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL); 
 		if (currentKeyStates[SDL_SCANCODE_UP]) 
@@ -117,7 +117,10 @@ void Example::GetUserInput()
 		{
 			uin.keyStates[UserInput::InputType::RIGHT] = false;
 		}
-		EntityManager::SetComponent<UserInput>(entityIndex, uin);
+
+		//std::cout << uin.keyStates[UserInput::InputType::RIGHT] << ", " << EntityManager::GetComponent<UserInput>(entityIndex).keyStates[UserInput::InputType::RIGHT] << std::endl;
+
+		//EntityManager::SetComponent<UserInput>(entityIndex, uin);
 	}
 		
 
@@ -128,9 +131,9 @@ void Example::HandleUserInput()
 	
 	for (int entityIndex : entities)
 	{
-		Velocity vel = EntityManager::GetComponent<Velocity>(entityIndex);
-		UserInput uin = EntityManager::GetComponent<UserInput>(entityIndex);
-		float speed = 100.0f;
+		Velocity& vel = EntityManager::GetComponent<Velocity>(entityIndex);
+		UserInput& uin = EntityManager::GetComponent<UserInput>(entityIndex);
+		float speed = 300.0f;
 		if (uin.keyStates[UserInput::InputType::UP])
 		{
 			vel.dy -= speed * Time::GetDeltaTime();
@@ -148,8 +151,8 @@ void Example::HandleUserInput()
 			vel.dx += speed * Time::GetDeltaTime();
 		}
 
-		EntityManager::SetComponent<Velocity>(entityIndex, vel);
-		EntityManager::SetComponent<UserInput>(entityIndex, uin);
+		//EntityManager::SetComponent<Velocity>(entityIndex, vel);
+		//EntityManager::SetComponent<UserInput>(entityIndex, uin);
 
 
 	}
@@ -198,8 +201,8 @@ void Example::Run()
 		EntityManager::SetComponent<Rect>(ent0, rect);
 
 		Friction frict;
-		frict.amountX = 20.0f;
-		frict.amountY = 20.0f;
+		frict.amountX = 100.0f;
+		frict.amountY = 100.0f;
 		EntityManager::SetComponent<Friction>(ent0, frict);
 
 		int ent1 = EntityManager::CreateEntity();
@@ -219,8 +222,8 @@ void Example::Run()
 		EntityManager::AddComponent<Velocity>(ent1);
 		EntityManager::AddComponent<UserInput>(ent1);
 		Friction frict2;
-		frict2.amountX = 20.0f;
-		frict2.amountY = 20.0f;
+		frict2.amountX = 150.0f;
+		frict2.amountY = 150.0f;
 		EntityManager::AddComponent<Friction>(ent1);
 		EntityManager::SetComponent<Friction>(ent1, frict2);
 
