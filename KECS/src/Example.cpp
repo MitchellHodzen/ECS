@@ -8,6 +8,8 @@
 #include "Components/c_input.h"
 #include "Components/c_friction.h"
 #include "Time.h"
+#include "MessageManager.h"
+#include "Messages/m_collision.h"
 void Example::Draw()
 {
 	SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
@@ -158,6 +160,23 @@ void Example::HandleUserInput()
 	}
 	
 }
+
+void Example::CheckCollisions()
+{
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Rect>();
+	for (int entityIndex : entities)
+	{
+		std::cout << "Test funtion " << entityIndex << std::endl;
+	}
+}
+void Example::HandleCollisions()
+{
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Rect>();
+	for (int entityIndex : entities)
+	{
+		std::cout << "Test funtion " << entityIndex << std::endl;
+	}
+}
 void Example::Test()
 {
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity>();
@@ -249,6 +268,8 @@ void Example::Run()
 			lastFrameTime = currentFrameTime;
 			currentFrameTime = SDL_GetTicks();
 			Time::CalculateDeltaTime(lastFrameTime, currentFrameTime);
+
+			MessageManager::ClearMessages<CollisionMessage>();
 
 			while (SDL_PollEvent(&e) != 0)
 			{

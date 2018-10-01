@@ -62,5 +62,11 @@
     <ClInclude Include="include\Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\MessageManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Messages\m_collision.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

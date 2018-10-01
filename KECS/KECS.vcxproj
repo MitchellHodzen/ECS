@@ -147,6 +147,8 @@
     <ClInclude Include="include\Components\c_velocity.h" />
     <ClInclude Include="include\EntityManager.h" />
     <ClInclude Include="include\ECS.h" />
+    <ClInclude Include="include\MessageManager.h" />
+    <ClInclude Include="include\Messages\m_collision.h" />
     <ClInclude Include="include\Stack.h" />
     <ClInclude Include="include\Tags.h" />
     <ClInclude Include="include\Time.h" />

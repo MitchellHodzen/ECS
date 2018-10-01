@@ -19,6 +19,8 @@ private:
 	void Physics();
 	void GetUserInput();
 	void HandleUserInput();
+	void CheckCollisions();
+	void HandleCollisions();
 	static void Test();
 	bool quit;
 };
