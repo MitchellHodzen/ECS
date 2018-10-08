@@ -28,7 +28,7 @@ void Example::Draw()
 	SDL_RenderPresent(renderer);
 }
 
-void Example::Physics()
+void Example::ApplyHorizontalPhysics()
 {
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Friction>();
 	for (int entityIndex : entities)
@@ -53,6 +53,19 @@ void Example::Physics()
 			}
 		}
 
+		pos.x += vel.dx * Time::GetDeltaTime();
+	}
+}
+
+void Example::ApplyVerticalPhysics()
+{
+	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Friction>();
+	for (int entityIndex : entities)
+	{
+		Position& pos = EntityManager::GetComponent<Position>(entityIndex);
+		Velocity& vel = EntityManager::GetComponent<Velocity>(entityIndex);
+		Friction& frict = EntityManager::GetComponent<Friction>(entityIndex);
+
 		if (vel.dy > 0)
 		{
 			vel.dy -= frict.amountY * Time::GetDeltaTime();
@@ -69,11 +82,7 @@ void Example::Physics()
 				vel.dy = 0;
 			}
 		}
-		pos.x += vel.dx * Time::GetDeltaTime();
 		pos.y += vel.dy * Time::GetDeltaTime();
-		//std::cout << vel.dx << ", " << vel.dy << std::endl;
-		//EntityManager::SetComponent<Position>(entityIndex, pos);
-		//EntityManager::SetComponent<Velocity>(entityIndex, vel);
 	}
 }
 
@@ -161,22 +170,109 @@ void Example::HandleUserInput()
 	
 }
 
+bool Example::RectsColliding(Rect rect1, Position pos1, Rect rect2, Position pos2)
+{
+
+	Position rectPos1;
+	Position rectPos2;
+	rectPos1.x = pos1.x + rect1.offsetX;
+	rectPos1.y = pos1.y + rect1.offsetY;
+	rectPos2.x = pos2.x + rect2.offsetX;
+	rectPos2.y = pos2.y + rect2.offsetY;
+
+	if ((rectPos1.x < rectPos2.x + rect2.width) &&
+		(rectPos1.x + rect1.width > rectPos2.x) &&
+		(rectPos1.y < rectPos2.y + rect2.height) &&
+		(rectPos1.y + rect1.height > rectPos2.y))
+	{
+		return true;
+	}
+	return false;
+}
+
+
 void Example::CheckCollisions()
 {
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Rect>();
+	std::vector<int> collidableEntities = EntityManager::GetEntitiesWithComponent<Position, Rect>();
 	for (int entityIndex : entities)
 	{
-		std::cout << "Test funtion " << entityIndex << std::endl;
+		for (int otherEntityIndex : collidableEntities)
+		{
+			if (entityIndex != otherEntityIndex)
+			{
+				Rect& rect1 = EntityManager::GetComponent<Rect>(entityIndex);
+				Position& pos1 = EntityManager::GetComponent<Position>(entityIndex);
+				Rect& rect2 = EntityManager::GetComponent<Rect>(otherEntityIndex);
+				Position& pos2 = EntityManager::GetComponent<Position>(otherEntityIndex);
+
+				if (RectsColliding(rect1, pos1, rect2, pos2))
+				{
+					CollisionMessage message(entityIndex, otherEntityIndex);
+					MessageManager::PushMessage<CollisionMessage>(message);
+				}
+				
+			}
+		}
 	}
 }
-void Example::HandleCollisions()
+void Example::HandleHorizontalCollisions()
 {
-	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity, Rect>();
-	for (int entityIndex : entities)
+	while (MessageManager::NotEmpty<CollisionMessage>())
 	{
-		std::cout << "Test funtion " << entityIndex << std::endl;
+		CollisionMessage message = MessageManager::PopMessage<CollisionMessage>();
+		std::cout << "collision detected" << std::endl;
+		Rect& rect1 = EntityManager::GetComponent<Rect>(message.entityOneIndex);
+		Position& pos1 = EntityManager::GetComponent<Position>(message.entityOneIndex);
+		Rect& rect2 = EntityManager::GetComponent<Rect>(message.entityTwoIndex);
+		Position& pos2 = EntityManager::GetComponent<Position>(message.entityTwoIndex);
+
+		Position rectPos1;
+		Position rectPos2;
+		rectPos1.x = pos1.x + rect1.offsetX;
+		rectPos2.x = pos2.x + rect2.offsetX;
+
+		//Handle horizontal collisions
+		if (rectPos1.x < rectPos2.x && rectPos1.x + rect1.width > rectPos2.x)
+		{
+			pos1.x = rectPos2.x - rect1.width - rect1.offsetX;
+		}
+		else if (rectPos1.x  < rectPos2.x + rect2.width && rectPos1.x + rect1.width > rectPos2.x + rect2.width)
+		{
+			pos1.x = rectPos2.x + rect2.width - rect1.offsetX;
+		}
+
 	}
 }
+
+void Example::HandleVerticalCollisions()
+{
+	while (MessageManager::NotEmpty<CollisionMessage>())
+	{
+		CollisionMessage message = MessageManager::PopMessage<CollisionMessage>();
+		std::cout << "collision detected" << std::endl;
+		Rect& rect1 = EntityManager::GetComponent<Rect>(message.entityOneIndex);
+		Position& pos1 = EntityManager::GetComponent<Position>(message.entityOneIndex);
+		Rect& rect2 = EntityManager::GetComponent<Rect>(message.entityTwoIndex);
+		Position& pos2 = EntityManager::GetComponent<Position>(message.entityTwoIndex);
+
+		Position rectPos1;
+		Position rectPos2;
+		rectPos1.y = pos1.y + rect1.offsetY;
+		rectPos2.y = pos2.y + rect2.offsetY;
+
+		//Handle vertical collisions
+		if (rectPos1.y < rectPos2.y && rectPos1.y + rect1.height > rectPos2.y)
+		{
+			pos1.y = rectPos2.y - rect1.height - rect1.offsetY;
+		}
+		else if (rectPos1.y  < rectPos2.y + rect2.height && rectPos1.y + rect1.height > rectPos2.y + rect2.height)
+		{
+			pos1.y = rectPos2.y + rect2.height - rect1.offsetY;
+		}
+	}
+}
+
 void Example::Test()
 {
 	std::vector<int> entities = EntityManager::GetEntitiesWithComponent<Position, Velocity>();
@@ -238,13 +334,13 @@ void Example::Run()
 		EntityManager::SetComponent<Rect>(ent1, rect1);
 		EntityManager::AddTag<Enemy>(ent1);
 		EntityManager::AddTag<Wall>(ent1);
-		EntityManager::AddComponent<Velocity>(ent1);
-		EntityManager::AddComponent<UserInput>(ent1);
-		Friction frict2;
-		frict2.amountX = 150.0f;
-		frict2.amountY = 150.0f;
-		EntityManager::AddComponent<Friction>(ent1);
-		EntityManager::SetComponent<Friction>(ent1, frict2);
+		//EntityManager::AddComponent<Velocity>(ent1);
+		//EntityManager::AddComponent<UserInput>(ent1);
+		//Friction frict2;
+		//frict2.amountX = 150.0f;
+		//frict2.amountY = 150.0f;
+		//EntityManager::AddComponent<Friction>(ent1);
+		//EntityManager::SetComponent<Friction>(ent1, frict2);
 
 		std::cout << "Entity " << ent0 << " is a player: " << EntityManager::HasTag<Player>(ent0) << std::endl;
 		std::cout << "Entity " << ent1 << " is a player: " << EntityManager::HasTag<Player>(ent1) << std::endl;
@@ -269,7 +365,7 @@ void Example::Run()
 			currentFrameTime = SDL_GetTicks();
 			Time::CalculateDeltaTime(lastFrameTime, currentFrameTime);
 
-			MessageManager::ClearMessages<CollisionMessage>();
+			//MessageManager::ClearMessages<CollisionMessage>();
 
 			while (SDL_PollEvent(&e) != 0)
 			{
@@ -303,7 +399,12 @@ void Example::Run()
 			}
 			GetUserInput();
 			HandleUserInput();
-			Physics();
+			ApplyHorizontalPhysics();
+			CheckCollisions();
+			HandleHorizontalCollisions();
+			ApplyVerticalPhysics();
+			CheckCollisions();
+			HandleVerticalCollisions();
 			Draw();
 		}
 		CloseSDL();
