@@ -221,7 +221,6 @@ void Example::HandleHorizontalCollisions()
 	while (MessageManager::NotEmpty<CollisionMessage>())
 	{
 		CollisionMessage message = MessageManager::PopMessage<CollisionMessage>();
-		std::cout << "collision detected" << std::endl;
 		Rect& rect1 = EntityManager::GetComponent<Rect>(message.entityOneIndex);
 		Position& pos1 = EntityManager::GetComponent<Position>(message.entityOneIndex);
 		Rect& rect2 = EntityManager::GetComponent<Rect>(message.entityTwoIndex);
@@ -250,7 +249,6 @@ void Example::HandleVerticalCollisions()
 	while (MessageManager::NotEmpty<CollisionMessage>())
 	{
 		CollisionMessage message = MessageManager::PopMessage<CollisionMessage>();
-		std::cout << "collision detected" << std::endl;
 		Rect& rect1 = EntityManager::GetComponent<Rect>(message.entityOneIndex);
 		Position& pos1 = EntityManager::GetComponent<Position>(message.entityOneIndex);
 		Rect& rect2 = EntityManager::GetComponent<Rect>(message.entityTwoIndex);
@@ -320,32 +318,35 @@ void Example::Run()
 		frict.amountY = 100.0f;
 		EntityManager::SetComponent<Friction>(ent0, frict);
 
-		int ent1 = EntityManager::CreateEntity();
-		EntityManager::AddComponent<Position>(ent1);
-		EntityManager::AddComponent<Rect>(ent1);
-		Position pos1 = EntityManager::GetComponent<Position>(ent1);
-		pos1.x = 200;
-		pos1.y = 200;
-		EntityManager::SetComponent<Position>(ent1, pos1);
+		Rect boxRect;
+		boxRect.width = 100;
+		boxRect.height = 100;
+		Position initialBoxPosition;
+		initialBoxPosition.x = 100;
+		initialBoxPosition.y = 400;
 
-		Rect rect1 = EntityManager::GetComponent<Rect>(ent1);
-		rect1.width = 100;
-		rect1.height = 75;
-		EntityManager::SetComponent<Rect>(ent1, rect1);
-		EntityManager::AddTag<Enemy>(ent1);
-		EntityManager::AddTag<Wall>(ent1);
-		//EntityManager::AddComponent<Velocity>(ent1);
-		//EntityManager::AddComponent<UserInput>(ent1);
-		//Friction frict2;
-		//frict2.amountX = 150.0f;
-		//frict2.amountY = 150.0f;
-		//EntityManager::AddComponent<Friction>(ent1);
-		//EntityManager::SetComponent<Friction>(ent1, frict2);
-
-		std::cout << "Entity " << ent0 << " is a player: " << EntityManager::HasTag<Player>(ent0) << std::endl;
-		std::cout << "Entity " << ent1 << " is a player: " << EntityManager::HasTag<Player>(ent1) << std::endl;
-		std::cout << "Entity " << ent0 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent0) << std::endl;
-		std::cout << "Entity " << ent1 << " is an enemy and wall: " << EntityManager::HasTag<Enemy, Wall>(ent1) << std::endl;
+		int numHBoxes = 5;
+		for (int i = 0; i < numHBoxes; ++i)
+		{
+			int entity = EntityManager::CreateEntity();
+			EntityManager::AddComponent<Position>(entity);
+			EntityManager::AddComponent<Rect>(entity);
+			Position& pos = EntityManager::GetComponent<Position>(entity);
+			pos.x = initialBoxPosition.x + boxRect.width * i;
+			pos.y = initialBoxPosition.y;
+			EntityManager::SetComponent<Rect>(entity, boxRect);
+		}
+		int numVBoxes = 3;
+		for (int i = 0; i < numVBoxes; ++i)
+		{
+			int entity = EntityManager::CreateEntity();
+			EntityManager::AddComponent<Position>(entity);
+			EntityManager::AddComponent<Rect>(entity);
+			Position& pos = EntityManager::GetComponent<Position>(entity);
+			pos.x = initialBoxPosition.x;
+			pos.y = initialBoxPosition.y - boxRect.height * i;
+			EntityManager::SetComponent<Rect>(entity, boxRect);
+		}
 
 		//EntityManager::DestroyEntity(ent1);
 		//ent1 = EntityManager::CreateEntity();
