@@ -2,10 +2,10 @@
 #define MAX_ENTITIES 100
 #include "EntityManager.h"
 //#include "ComponentManager.h"
-class ECS
+class KECS
 {
 public:
-	ECS();
-	~ECS();
+	KECS();
+	~KECS();
 };
 
