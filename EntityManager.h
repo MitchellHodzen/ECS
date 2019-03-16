@@ -307,10 +307,12 @@ private:
 		//Template function to set an entities component
 		template<typename T> static void SetComponent(int entityIndex, T value)
 		{
-			if (HasComponent<T>(entityIndex))
+			if (!HasComponent<T>(entityIndex))
 			{
-				componentArray<T>[entityIndex] = value;
+				AddComponent<T>(entityIndex);
 			}
+			componentArray<T>[entityIndex] = value;
+
 		}
 
 		//Removes all components from a given entity
