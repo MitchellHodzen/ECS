@@ -5,11 +5,13 @@
 #include <iostream>
 #include <vector>
 
+typedef int Entity;
+
 class EntityManager
 {
 public:
 	//Entity related functions
-	static int CreateEntity()
+	static Entity CreateEntity()
 	{
 		if (entityCount < MAX_ENTITIES)
 		{
@@ -32,16 +34,17 @@ public:
 	}
 
 
-	static void DestroyEntity(int entityIndex)
+	static void DestroyEntity(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			availableEntityIndicies->Push(entityIndex);
-			SetValidEntityIndex(entityIndex, false);
+			ComponentManager::ClearEntityComponents(entity);
+			SetValidEntityIndex(entity, false);
+			availableEntityIndicies->Push(entity);
 		}
 		else
 		{
-			std::cout << "Cannot delete entity: invalid entity index" << std::endl;
+			std::cout << "Cannot delete entity: invalid entity" << std::endl;
 		}
 	}
 
@@ -55,11 +58,11 @@ public:
 	}
 
 
-	static bool IsValidEntityIndex(int entityIndex)
+	static bool IsValidEntity(int entity)
 	{
-		if (entityIndex < MAX_ENTITIES)
+		if (entity < MAX_ENTITIES)
 		{
-			return validEntityIndicies[entityIndex];
+			return validEntityIndicies[entity];
 		}
 		return false;
 	}
@@ -93,69 +96,69 @@ public:
 	}
 
 	//Template function to add a component 
-	template<typename T, typename... Args> static void AddComponent(int entityIndex)
+	template<typename T, typename... Args> static void AddComponent(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			ComponentManager::AddComponent<T, Args...>(entityIndex);
+			ComponentManager::AddComponent<T, Args...>(entity);
 		}
 		else
 		{
-			std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot add component" << std::endl;
+			std::cout << "Entity " << entity << " is not a valid entity. Cannot add component" << std::endl;
 		}
 	}
 
 	//Template function to remove a component 
-	template<typename T, typename... Args> static void RemoveComponent(int entityIndex)
+	template<typename T, typename... Args> static void RemoveComponent(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			ComponentManager::RemoveComponent<T, Args...>(entityIndex);
+			ComponentManager::RemoveComponent<T, Args...>(entity);
 		}
 		else
 		{
-			std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot remove component" << std::endl;
+			std::cout << "Entity " << entity << " is not a valid entity. Cannot remove component" << std::endl;
 		}
 	}
 
 	//Template function to check if an entity has a component
-	template<typename T, typename... Args> static bool HasComponent(int entityIndex)
+	template<typename T, typename... Args> static bool HasComponent(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			return ComponentManager::HasComponent<T, Args...>(entityIndex);
+			return ComponentManager::HasComponent<T, Args...>(entity);
 		}
-		std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot check component" << std::endl;
+		std::cout << "Entity " << entity << " is not a valid entity. Cannot check component" << std::endl;
 		return false;
 	}
 
 	//Template function to get an entities component 
-	template<typename T> static T& GetComponent(int entityIndex)
+	template<typename T> static T& GetComponent(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			return ComponentManager::GetComponent<T>(entityIndex);
+			return ComponentManager::GetComponent<T>(entity);
 		}
-		std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot get component. Returning nonsense" << std::endl;
+		std::cout << "Entity " << entity << " is not a valid entity. Cannot get component. Returning nonsense" << std::endl;
 
 	}
 
 	//Template function to set an entities component
-	template<typename T> static void SetComponent(int entityIndex, T value)
+	template<typename T> static void SetComponent(Entity entity, T value)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			ComponentManager::SetComponent<T>(entityIndex, value);
+			ComponentManager::SetComponent<T>(entity, value);
 		}
 	}
 
 	//Template function to get all entities which contain a set of components
-	template<typename... Components> static std::vector<int> GetEntitiesWithComponent()
+	template<typename... Components> static std::vector<Entity> GetEntitiesWithComponent()
 	{
-		std::vector<int> vec;
-		for (int i = 0; i <= GetTopEntityIndex(); ++i)
+		std::vector<Entity> vec;
+		for (Entity i = 0; i <= GetTopEntityIndex(); ++i)
 		{
-			if (IsValidEntityIndex(i) && ComponentManager::HasComponent<Components...>(i))
+			if (IsValidEntity(i) && ComponentManager::HasComponent<Components...>(i))
 			{
 				vec.push_back(i);
 			}
@@ -170,39 +173,39 @@ public:
 	}
 
 	//Template function to add a component 
-	template<typename T, typename... Args> static void AddTag(int entityIndex)
+	template<typename T, typename... Args> static void AddTag(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			TagManager::AddTag<T, Args...>(entityIndex);
+			TagManager::AddTag<T, Args...>(entity);
 		}
 		else
 		{
-			std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot add tag" << std::endl;
+			std::cout << "Entity " << entity << " is not a valid entity. Cannot add tag" << std::endl;
 		}
 	}
 
 	//Template function to remove a component 
-	template<typename T, typename... Args> static void RemoveTag(int entityIndex)
+	template<typename T, typename... Args> static void RemoveTag(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			TagManager::RemoveTag<T, Args...>(entityIndex);
+			TagManager::RemoveTag<T, Args...>(entity);
 		}
 		else
 		{
-			std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot remove tag" << std::endl;
+			std::cout << "Entity " << entity << " is not a valid entity. Cannot remove tag" << std::endl;
 		}
 	}
 
 	//Template function to check if an entity has a component
-	template<typename T, typename... Args> static bool HasTag(int entityIndex)
+	template<typename T, typename... Args> static bool HasTag(Entity entity)
 	{
-		if (IsValidEntityIndex(entityIndex))
+		if (IsValidEntity(entity))
 		{
-			return TagManager::HasTag<T, Args...>(entityIndex);
+			return TagManager::HasTag<T, Args...>(entity);
 		}
-		std::cout << "Entity " << entityIndex << " is not a valid entity. Cannot check tag" << std::endl;
+		std::cout << "Entity " << entity << " is not a valid entity. Cannot check tag" << std::endl;
 		return false;
 	}
 
