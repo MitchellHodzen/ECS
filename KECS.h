@@ -13,7 +13,7 @@ public:
 	//Entity related functions
 	static Entity CreateEntity()
 	{
-		if (entityCount < MAX_ENTITIES)
+		if (entityCount < MAX_ENTITIES - 1 && !availableEntityIndicies->IsEmpty())
 		{
 			int entityIndex = availableEntityIndicies->Pop();
 			ComponentManager::ClearEntityComponents(entityIndex);
