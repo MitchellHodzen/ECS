@@ -133,14 +133,14 @@ public:
 	}
 
 	//Template function to get an entities component 
-	template<typename T> static T& GetComponent(Entity entity)
+	template<typename T> static T* GetComponent(Entity entity)
 	{
 		if (IsValidEntity(entity))
 		{
 			return ComponentManager::GetComponent<T>(entity);
 		}
-		std::cout << "Entity " << entity << " is not a valid entity. Cannot get component. Returning nonsense" << std::endl;
-
+		std::cout << "Entity " << entity << " is not a valid entity. Cannot get component. Returning nullptr" << std::endl;
+		return nullptr;
 	}
 
 	//Template function to set an entities component
@@ -299,13 +299,14 @@ private:
 		}
 
 		//Template function to get an entities component 
-		template<typename T> static T& GetComponent(int entityIndex)
+		template<typename T> static T* GetComponent(int entityIndex)
 		{
 			if (HasComponent<T>(entityIndex))
 			{
-				return componentArray<T>[entityIndex];
+				return &(componentArray<T>[entityIndex]);
 			}
-			std::cout << "Entity " << entityIndex << " does not have that component. Cannot get component. Returning nonsense" << std::endl;
+			std::cout << "Entity " << entityIndex << " does not have that component. Cannot get component. Returning nullptr" << std::endl;
+			return nullptr;
 		}
 
 		//Template function to set an entities component
