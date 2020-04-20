@@ -95,8 +95,8 @@ public:
 		ComponentManager::SetUpComponents<T, Args...>();
 	}
 
-	//Template function to add a component 
-	template<typename T, typename... Args> static void AddComponent(Entity entity)
+	//Template function to add multiple components. Nothing is returned, a get must be called afterwards
+	template<typename T, typename... Args> static void AddComponents(Entity entity)
 	{
 		if (IsValidEntity(entity))
 		{
@@ -105,6 +105,20 @@ public:
 		else
 		{
 			std::cout << "Entity " << entity << " is not a valid entity. Cannot add component" << std::endl;
+		}
+	}
+
+	//Template function to add a component 
+	template<typename T> static T* AddComponent(Entity entity)
+	{
+		if (IsValidEntity(entity))
+		{
+			return ComponentManager::AddComponent<T>(entity);
+		}
+		else
+		{
+			std::cout << "Entity " << entity << " is not a valid entity. Cannot add component" << std::endl;
+			return nullptr;
 		}
 	}
 
@@ -144,6 +158,7 @@ public:
 	}
 
 	//Template function to set an entities component
+	/*
 	template<typename T> static void SetComponent(Entity entity, T value)
 	{
 		if (IsValidEntity(entity))
@@ -151,6 +166,7 @@ public:
 			ComponentManager::SetComponent<T>(entity, value);
 		}
 	}
+	*/
 
 	//Template function to get all entities which contain a set of components
 	template<typename... Components> static std::vector<Entity> GetEntitiesWithComponent()
@@ -256,13 +272,8 @@ private:
 		}
 
 
-		//Template function to add a component 
-		template<typename T, typename S, typename... Args> static void AddComponent(int entityIndex)
-		{
-			AddComponent<T>(entityIndex);
-			AddComponent<S, Args...>(entityIndex);
-		}
-		template<typename T> static void AddComponent(int entityIndex)
+		//Template function to add a single component 
+		template<typename T> static T* AddComponent(int entityIndex)
 		{
 			if (!HasComponent<T>(entityIndex))
 			{
@@ -270,6 +281,32 @@ private:
 				UpdateEntityComponent<T>(entityIndex, true);
 				//Reset the component to default values
 				componentArray<T>[entityIndex] = T();
+			}
+			else
+			{
+				std::cout<< "Entity " << entityIndex << " already has component " << typeid(T).name() << ". Returning existing component"<<std::endl;
+			}
+			return &(componentArray<T>[entityIndex]);
+		}
+
+		//Template function to add multiple components
+		template<typename T, typename S, typename... Args> static void AddComponents(int entityIndex)
+		{
+			AddComponent<T>(entityIndex);
+			AddComponent<S, Args...>(entityIndex);
+		}
+		template<typename T> static void AddComponents(int entityIndex)
+		{
+			if (!HasComponent<T>(entityIndex))
+			{
+				std::cout << "Adding entity " << entityIndex << "'s " << typeid(T).name() << " component" << std::endl;
+				UpdateEntityComponent<T>(entityIndex, true);
+				//Reset the component to default values
+				componentArray<T>[entityIndex] = T();
+			}
+			else
+			{
+				std::cout<< "Entity " << entityIndex << " already has component " << typeid(T).name() << ". Returning existing component"<<std::endl;
 			}
 		}
 
@@ -310,6 +347,7 @@ private:
 		}
 
 		//Template function to set an entities component
+		/*
 		template<typename T> static void SetComponent(int entityIndex, T value)
 		{
 			if (!HasComponent<T>(entityIndex))
@@ -319,6 +357,7 @@ private:
 			componentArray<T>[entityIndex] = value;
 
 		}
+		*/
 
 		//Removes all components from a given entity
 		static void ClearEntityComponents(int entityIndex)
