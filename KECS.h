@@ -60,7 +60,7 @@ public:
 
 	static bool IsValidEntity(int entity)
 	{
-		if (entity < MAX_ENTITIES)
+		if (entity < MAX_ENTITIES && entity > -1)
 		{
 			return validEntityIndicies[entity];
 		}
