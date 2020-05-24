@@ -182,6 +182,20 @@ public:
 		return vec;
 	}
 
+	//Template function to get all entities which has a set of tags
+	template<typename... Tags> static std::vector<Entity> GetEntitiesWithTag()
+	{
+		std::vector<Entity> vec;
+		for (Entity i = 0; i <= GetTopEntityIndex(); ++i)
+		{
+			if (IsValidEntity(i) && TagManager::HasTag<Tags...>(i))
+			{
+				vec.push_back(i);
+			}
+		}
+		return vec;
+	}
+
 	//Function wrappers for tags
 	template<typename T, typename... Args> static void SetUpTags()
 	{
